@@ -1,39 +1,34 @@
 #ifndef _BROKER_H_
 #define _BROKER_H_
 
-/*
-include
+#include "mqtt.h"
+#include "client.h"
+#include "topic.h"
+#include "mynet.h"
+#include "pthread.h"
+#include <stdbool.h>
 
-#define BROKER_VERSION "1.0"
-#define BROKER_NAME "This is broker"
+// model
+typedef struct broker
+{
+    mqtt_connection* listener;
+    pthread_mutex_t mutex;
+    topic_tree *topics;
+    client* clientList;
+    bool isActive;
+    pthread_mutex_t mutex;
 
-struct broker_info{
-    char* ver;
-    char* name;
-}
-
-struct broker{
-   broker_info* info;
-   mqtt_connection* listener;
-   isClose
-   pthread_mutex_t mutex;
-   topic_tree
-}
-
-
-void broker_new
-..  broker_free
-    broker_destroy
-    broker_close
-    broker_accept
-    broker_del_client
-    broker_transfer_mes
-    broker_add_sub
-    broker_del_sub
-    broker_find_subs
+} broker;
 
 
+// funtion
+void doCloseBroker(broker *broker, uint8_t lock);
+broker *initBroker(char *host, uint16_t port);
+void rmvBroker(broker *b);
+client *doBrokerAccept(broker *b);
+void doBrokerSendMessage(client *cliSender, subcriber *subcriber, message *mes);
+void doBrokerAddSubcriber(broker* b, subcriber* s);
+void doBrokerRmvSubcriber(broker* b, subcriber* sub);
+char* doBrokerFindSubcriber(broker* b, char* topic);
 
-*/
-
-#endif  // _BROKER_H_
+#endif // _BROKER_H_
