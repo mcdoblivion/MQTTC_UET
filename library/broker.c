@@ -4,6 +4,7 @@
 #include "mynet.h"
 #include "pthread.h"
 
+
 void doCloseBroker(broker *broker, uint8_t lock)
 {
     if (lock)
@@ -65,7 +66,7 @@ void doBrokerSendMessage(client *cliSender, subcriber *subcriber, message *mes)
     char *clientId = subcriber->client->id;
 
     //need to write function to get client has id = clientid from broker->clients, after that return for clirecv
-    client *cliRecv;
+    client* cliRecv;
 
     if (cliRecv == subcriber->client) //this line may be redundant
     {

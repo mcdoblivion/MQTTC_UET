@@ -1,7 +1,6 @@
 #ifndef _MESSAGE_H_
 #define _MESSAGE_H_
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,8 +8,6 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "status.h"
-
 
 #define FIXED_HEADER_SIZE 16  // bytes
 #define OFFSET_MESSAGE_TYPE 0
@@ -20,9 +17,8 @@
 
 typedef enum {
     CON = 1,
-    CONACK,
     PUB,
-    PUBACK,
+    ACK,
     SUB,
     SUBACK,
     UNSUB,
@@ -42,13 +38,6 @@ typedef struct variable_header {
 
 
 typedef struct message {
-    // mes_type
-    // flag
-    // variable_header_size
-    // payload_size
-    // variable_header
-    // payload
-
     // fixed header
     uint8_t mes_type;
     uint8_t flag;
@@ -63,20 +52,28 @@ typedef struct message {
 
 } message;
 
-// status mes__free()
+
 message* mes_new();
-// void mes_clear
-// void mes_get_var_header
-// void mes_set_var_header
-// void mes_set_flag
-// void
+const char *mes_type_tostring(mqtt_mes_type type);
+variable_header *variable_header_new(char *key, char *data);
+void mes_free(message *mes);
 
-// status mes_recv(mqtt_connection* conn, message* mes);
-// status mes_send(mqtt_connection* conn, message* mes);
+// set and get
+variable_header *mes_get_var_header_data(message *mes);
+void mes_set_message_type(message *mes, uint8_t mes_type);
+void mes_set_flag(message *mes, uint16_t flag);
+void mes_set_variable_header(message *mes, char *key, char *data);
+void mes_set_payload(message *mes, uint8_t *payload, uint32_t payload_size);
 
-status mes_CON(message *mes, uint8_t *info, uint32_t payload_size);
-status mes_PUB(message *mes, char *topic, uint8_t flag, uint8_t *payload, uint32_t size);
-status mes_SUB(message *mes, uint8_t flag, char *mes_id, char *topic);
-status mes_UNSUB(message *mes, uint8_t flag, char *mes_id, char *topic);
+//classify type of mes
+void mes_CON(message *mes, uint8_t *info, uint32_t payload_size);
+void mes_PUB(message *mes, char *topic, uint8_t flag, uint8_t *payload, uint32_t size);
+void mes_SUB(message *mes, uint8_t flag, char *mes_id, char *topic);
+void mes_UNSUB(message *mes, uint8_t flag, char *mes_id, char *topic);
+void mes_ACK(message *dst, message *src, char *msg);
+
+//action with mes
+void mes_send(mqtt_connection* con, message* mes);
+void mes_recv(mqtt_connection* con, message* mes);
 
 #endif

@@ -1,7 +1,6 @@
 #include "client.h"
 #include "broker.h"
 #include "mynet.h"
-#include "status.h"
 #include "message.h"
 #include <pthread.h>
 
