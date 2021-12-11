@@ -51,10 +51,10 @@ void rmvBroker(broker *b)
 
 client *doBrokerAccept(broker *b)
 {
-    mqtt_connection *connection = mynet_accept(b->listener);
-    client *client = client_new(connection, b);
-    b->clientList = client;
-    return client;
+    mqtt_connection *con = mynet_accept(b->listener);
+    client *cli = client_new(con, b);
+    b->clientList = cli;
+    return cli;
 }
 
 void doBrokerSendMessage(client *cliSender, subcriber *subcriber, message *mes)
@@ -62,7 +62,7 @@ void doBrokerSendMessage(client *cliSender, subcriber *subcriber, message *mes)
     broker *b = cliSender->broker;
     mes_set_variable_header(mes, "topic", subcriber_get_topic(subcriber));
 
-    client *client;
+    client *cli;
     char *clientId = subcriber->client->id;
 
     //need to write function to get client has id = clientid from broker->clients, after that return for clirecv
@@ -83,7 +83,7 @@ void doBrokerAddSubcriber(broker* b, subcriber* s){
     topic_add_sub(b->topics, s);
 }
 
-void doBrokerRmvSubcriber(broker* b, subcriber* sub){
+void doBrokerRmvSubcriber(broker* b, subcriber* s){
     topic_rmv_sub(b->topics, s);
 }
 

@@ -4,17 +4,18 @@ project(MQTTC_UET VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 11)
 
 #COMPILER
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pthread")
 
 #BUILD LIB
-#add_library(MQTTC_UET STATIC ${LIBS})
+add_subdirectory(library)
 
 #SOURCE
-file(GLOB SERVER_SRC "server/*.c")
-file(GLOB CLIENT_SRC "client/*.c")
+file(GLOB SERVER_SRC "src/server/*.c")
+file(GLOB CLIENT_SRC "src/client/*.c")
 
 add_executable(server ${SERVER_SRC})
-#target_link_libraries(server MQTTC_UET)
+target_link_libraries(server library)
 
 add_executable(client ${CLIENT_SRC})
-#target_link_libraries(client MQTTC_UET)
+target_link_libraries(client library)
