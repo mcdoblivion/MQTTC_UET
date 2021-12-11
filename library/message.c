@@ -27,7 +27,7 @@ variable_header *variable_header_new(char *key, char *data)
     return newVarHeader;
 }
 
-message *mes__new()
+message *mes_new()
 {
     message *newMes = (message *)malloc(sizeof(message));
     if (!newMes)
@@ -64,7 +64,7 @@ void mes_set_flag(message *mes, uint16_t flag)
 void mes_set_variable_header(message *mes, char *key, char *data)
 {
     uint16_t key_len = strlen(key);
-    uint16_t data = strlen(data);
+    uint16_t data_len = strlen(data);
 
     variable_header *vh = NULL;
     vh = variable_header_new(key, data);
@@ -88,8 +88,9 @@ void mes_set_payload(message *mes, uint8_t *payload, uint32_t payload_size)
 
 void mes_CON(message *mes, uint8_t *payload_data, uint32_t payload_size)
 {
-    mes_set_flag(mes, 0);
+    mes_set_flag(mes, FLAG_CON);
     mes_set_message_type(mes, CON);
+    // lack of set var header ????
     mes_set_payload(mes, payload_size, payload_data);
 }
 
@@ -145,26 +146,28 @@ void mes_ACK(message *dst, message *src, char *msg)
 void mes_send(mqtt_connection *con, message *mes)
 {
     uint8_t fixed_header[FIXED_HEADER_SIZE];
-    uint16_t vars_size = mes->variable_size;
     uint16_t mes_type = mes->mes_type;
     uint16_t flag = mes->flag;
+    uint16_t vars_size = mes->variable_size;
     uint16_t payload_size = mes->payload_size;
-    memcpy(fixed_header + OFFSET_REMAIN_VAR_SIZE, &vars_size, sizeof(vars_size));
+
     memcpy(fixed_header + OFFSET_MESSAGE_TYPE, &mes_type, sizeof(mes_type));
     memcpy(fixed_header + OFFSET_FLAG, &flag, sizeof(flag));
+    memcpy(fixed_header + OFFSET_REMAIN_VAR_SIZE, &vars_size, sizeof(vars_size));
     memcpy(fixed_header + OFFSET_REMAIN_PAYLOAD_SIZE, &payload_size, sizeof(payload_size));
 
+    //////////////////////// need consider why do we sent each part of mes but not all mes ?
     mynet_write(con, fixed_header, FIXED_HEADER_SIZE);
 
     if (mes->variable_size > 0)
     {
-        uint8_t var_header_buff = (uint8_t *)malloc(sizeof(uint8_t) * vars_size);
+        uint8_t *var_header_buff = (uint8_t *)malloc(sizeof(uint8_t) * vars_size);
 
         mynet_write(con, var_header_buff, mes->variable_size);
     }
     if (mes->payload_size > 0)
     {
-        uint8_t payload_buf = (uint8_t *)malloc(sizeof(uint8_t) * payload_size);
+        uint8_t *payload_buf = (uint8_t *)malloc(sizeof(uint8_t) * payload_size);
 
         mynet_write(con, payload_buf, mes->payload_size);
     }
@@ -174,21 +177,30 @@ void mes_recv(mqtt_connection *con, message *mes)
 {
     // make empty mes
     uint8_t fixed_header[FIXED_HEADER_SIZE];
-
     mynet_read(con, fixed_header, FIXED_HEADER_SIZE);
 
-    uint16_t vars_size = mes->variable_size;
-    uint16_t mes_type = mes->mes_type;
-    uint16_t flag = mes->flag;
-    uint16_t payload_size = mes->payload_size;
-    memcpy(fixed_header + OFFSET_REMAIN_VAR_SIZE, &vars_size, sizeof(vars_size));
-    memcpy(fixed_header + OFFSET_MESSAGE_TYPE, &mes_type, sizeof(mes_type));
-    memcpy(fixed_header + OFFSET_FLAG, &flag, sizeof(flag));
-    memcpy(fixed_header + OFFSET_REMAIN_PAYLOAD_SIZE, &payload_size, sizeof(payload_size));
+    uint16_t vars_size;
+    uint16_t mes_type;
+    uint16_t flag;
+    uint16_t payload_size;
+    memcpy(&mes_type, fixed_header + OFFSET_MESSAGE_TYPE, sizeof(mes_type));
+    memcpy(&flag, fixed_header + OFFSET_FLAG, sizeof(flag));
+    memcpy(&vars_size, fixed_header + OFFSET_REMAIN_VAR_SIZE, sizeof(vars_size));
+    memcpy(&payload_size, fixed_header + OFFSET_REMAIN_PAYLOAD_SIZE, sizeof(payload_size));
+    
+    // set fix header
+    mes_set_flag(mes, flag);
+    mes_set_message_type(mes, mes_type);
+    mes->variable_size = vars_size;
+    mes->payload_size = payload_size;
 
-    // the ideal is make "mes" new and parse data from "con" to each part in mes
-    // net__read(conn, var_hdr_buf, vars_size, &n_read, 1);
-    // frame__parse_var_header(frame, var_hdr_buf, vars_size);
-    // frame__malloc_payload(frame, data_size);
-    // net__read(conn, frame->payload, data_size, &n_read, 1);
+    // set variable_header_data
+    uint8_t* variable_header_data = (uint8_t*)malloc(sizeof(uint8_t) * vars_size);
+    mynet_read(con, variable_header_data, vars_size);
+    mes_set_variable_header(mes, variable_header_data, vars_size);
+//   set payload_data
+    uint8_t* payload_data = (uint8_t*)malloc(sizeof(uint8_t) * payload_size);
+    mynet_read(con, payload_data, payload_size);
+    mes_set_payload(mes, payload_data, payload_size);
+
 }

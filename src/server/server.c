@@ -1,5 +1,4 @@
 //this is file server
-
 #include <arpa/inet.h>
 #include <errno.h>
 #include <pthread.h>
@@ -28,11 +27,14 @@ void serverDoSentAck(client *cli, message *mesIn, char *msg)
 void serverHandleCON(client *cli)
 {
     //guiwr laij thoong tin vef broker
+    printf("serverHandleCON");
 }
 
 void serverHandlePUB(client *cli)
 {
-    message *in = cli->income;
+    printf("serverHandleCON");
+
+   // message *in = cli->income;
 
     //find topic from mes income
     // broker find subs have topic above
@@ -43,6 +45,8 @@ void serverHandlePUB(client *cli)
 
 void serverHandleSUB(client *cli)
 {
+    printf("serverHandleCON");
+
     //find topic in "income"->var_header
     // call client_sub(cli, topic_value)
     // call serverDoSentAck(client* cli, cli->income, char* msg)
@@ -51,17 +55,17 @@ void serverHandleSUB(client *cli)
 void handleUNSUB(client *cli)
 {
     //
+    printf("serverHandleCON");
+
 }
 
-void serverDoHandleClient(client *cli)
+void todoHandleClient(client *cli)
 {
-    pthread_t tid = pthread_self();
-    pthread_detach(tid);
     broker *mybroker = cli->broker;
-
     while (true)
     {
-        client_read(cli); // read a client
+        //client_read(cli); // read a client
+        mes_recv(cli->connection, cli->income);
         switch (cli->income->mes_type)
         {
         case CON:
@@ -81,18 +85,19 @@ void serverDoHandleClient(client *cli)
             break;
         }
     }
+    pthread_detach(pthread_self());
 }
 
 int main(int argc, char *argv[])
 {
-
     mybroker = initBroker(DEFAULT_ADDR, DEFAULT_PORT);
-
+    
     client *myclient = NULL;
     pthread_t tid;
+    
     while (true)
     {
         myclient = doBrokerAccept(mybroker);
-        pthread_create(&tid, NULL, &serverDoHandleClient, (void *)myclient);
+        pthread_create(&tid, NULL, &todoHandleClient, (void *)myclient);
     }
 }

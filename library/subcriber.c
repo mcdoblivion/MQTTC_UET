@@ -1,5 +1,5 @@
-#include "subcriber.h"
 #include "mqtt.h"
+#include "subcriber.h"
 #include "client.h"
 #include "topic.h"
 
@@ -27,7 +27,7 @@ subcriber* subcriber_new(char* topic, client* client, topic_node* node){
     memset(new_sub, 0, sizeof(*new_sub));
     new_sub->id = subcriber_init_id(topic, client);
     new_sub->client = client;
-    new_sub->topic = node;
+    new_sub->node = node;
 
     return new_sub;
 

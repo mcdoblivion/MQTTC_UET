@@ -17,13 +17,14 @@ void rand_str_id(char *dest, size_t length) {
     *dest = '\0';
 }
 
-void client_new(mqtt_connection* connection, broker* broker){
+client* client_new(mqtt_connection* connection, broker* broker){
     client* client = malloc(sizeof(client));
     rand_str_id(client->id, 5);
     client->connection = connection;
     client->broker= broker;
     client->income = mes_new();
     client->outcome = mes_new();
+    return client;
 
 }
 

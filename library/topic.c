@@ -12,7 +12,7 @@ topic_node *topic_node_new()
 
 void topic_node_add_sub(topic_node *n, subcriber *s)
 {
-    s->topic_node = n;
+    s->node = n;
     subcriber *ptr = n->sub_list;
     ptr = &s;
     memcpy(n->sub_list, ptr, 10);
@@ -70,18 +70,18 @@ void topic_add_sub(topic_tree *tree, subcriber *subcriber)
 
 void topic_rmv_sub(topic_tree *tree, subcriber *subcriber)
 {
-    topic_node *node = subcriber->topic_node;
+    topic_node *node = subcriber->node;
     char *first_topic;
     int len = 0;
     char *topic = subcriber_get_topic(subcriber);
     topic_extract_token(topic, len, first_topic);
 
-    subcriber->topic_node = NULL;
+    subcriber->node = NULL;
 }
 
 char *topic_node_find_sub(topic_node *node, char *first_topic, int len)
 {
-    print("thisnotthing");
+    printf("thisnotthing");
 }
 
 char *topic_tree_find_sub(topic_tree *tree, char *topic)

@@ -17,12 +17,12 @@ typedef enum {
     RECONNECTING,
     DISCONNECTED,
     CLOSE,
-} net_status;
+} mqtt_status;
 
 typedef struct mqtt_connection {
     int sockfd;
     struct sockaddr_in* addr;
-    net_status status;
+    mqtt_status status;
 } mqtt_connection;
 
 

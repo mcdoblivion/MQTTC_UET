@@ -1,6 +1,7 @@
 #ifndef _MESSAGE_H_
 #define _MESSAGE_H_
 
+#include "mqtt.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,35 +10,44 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define FIXED_HEADER_SIZE 16  // bytes
+#define FIXED_HEADER_SIZE 16 // bytes
 #define OFFSET_MESSAGE_TYPE 0
 #define OFFSET_FLAG 4
 #define OFFSET_REMAIN_VAR_SIZE 8
 #define OFFSET_REMAIN_PAYLOAD_SIZE 12
 
-typedef enum {
+typedef enum
+{
     CON = 1,
     PUB,
-    ACK,
     SUB,
     SUBACK,
     UNSUB,
     UNSUBACK,
+    ACK,
     DISCON
 } mqtt_mes_type;
 
-typedef enum {
-    flag_ack = 0x80,
-    flag_puback = 0x40
+typedef enum
+{
+    FLAG_CON = 0x01,
+    FLAG_PUB = 0x02,
+    FLAG_SUB = 0x03,
+    FLAG_SUBACK,
+    flag_UNSUB,
+    FLAG_UNSUBACK,
+    FLAG_ACK,
+
 } mqtt_flag;
 
-typedef struct variable_header {
-    char* key;
-    char* data;
+typedef struct variable_header
+{
+    char *key;
+    char *data;
 } variable_header;
 
-
-typedef struct message {
+typedef struct message
+{
     // fixed header
     uint8_t mes_type;
     uint8_t flag;
@@ -45,15 +55,14 @@ typedef struct message {
     uint8_t payload_size;
 
     //variable header
-    variable_header* variable_header;
-    
+    variable_header *variable_header;
+
     //payload
     uint8_t payload;
 
 } message;
 
-
-message* mes_new();
+message *mes_new();
 const char *mes_type_tostring(mqtt_mes_type type);
 variable_header *variable_header_new(char *key, char *data);
 void mes_free(message *mes);
@@ -73,7 +82,7 @@ void mes_UNSUB(message *mes, uint8_t flag, char *mes_id, char *topic);
 void mes_ACK(message *dst, message *src, char *msg);
 
 //action with mes
-void mes_send(mqtt_connection* con, message* mes);
-void mes_recv(mqtt_connection* con, message* mes);
+void mes_send(mqtt_connection *con, message *mes);
+void mes_recv(mqtt_connection *con, message *mes);
 
 #endif

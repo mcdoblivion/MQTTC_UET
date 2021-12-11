@@ -1,8 +1,11 @@
 #include "mqtt.h"
 #include "client.h"
-#include "topic.h"
 #include "mynet.h"
 #include "pthread.h"
+#include "broker.h"
+#include "subcriber.h"
+#include "topic.h"
+
 
 
 void doCloseBroker(broker *broker, uint8_t lock)
@@ -21,6 +24,7 @@ broker *initBroker(char *host, uint16_t port)
 {
     // construct broker b
     broker *b = (broker *)malloc(sizeof(broker));
+    
     if (!b)
         return NULL;
     else
@@ -53,6 +57,8 @@ client *doBrokerAccept(broker *b)
 {
     mqtt_connection *con = mynet_accept(b->listener);
     client *cli = client_new(con, b);
+
+    ///////////////////// why do you assign a cli to a pointer list?
     b->clientList = cli;
     return cli;
 }
@@ -66,7 +72,7 @@ void doBrokerSendMessage(client *cliSender, subcriber *subcriber, message *mes)
     char *clientId = subcriber->client->id;
 
     //need to write function to get client has id = clientid from broker->clients, after that return for clirecv
-    client* cliRecv;
+    client* cliRecv = NULL;
 
     if (cliRecv == subcriber->client) //this line may be redundant
     {

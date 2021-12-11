@@ -11,17 +11,15 @@
 
 struct client {
     char id[5];
-
     broker* broker;
     mqtt_connection* connection;
     subcriber* subcribers;
-    
     message* income;
     message* outcome;
 
 }; 
 
-void client_new(mqtt_connection* connection, broker* broker);
+client* client_new(mqtt_connection* connection, broker* broker);
 void client_send(client* client, message* mes);
 void client_receive(client* client, message* mes);
 

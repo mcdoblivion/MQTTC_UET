@@ -24,9 +24,9 @@ int pexit(const char *str)
     exit(1);
 }
 
-mqtt_connection* clientDoConnect()
+mqtt_connection *clientDoConnect()
 {
-    mqtt_connection *con = mynet_connect("127.0.0.1", 4444);
+    mqtt_connection *con = mynet_connect("127.0.0.1", DEFAULT_PORT);
     if (!con)
         exit(1);
 
@@ -43,26 +43,26 @@ mqtt_connection* clientDoConnect()
     //receive CONACK
     mes_recv(con, mes);
 
-    printf("CONACK FROM BROKER: %s\n", mes->payload? (char*)mes->payload : "CONNECT DISMISS");
+    printf("CONACK FROM BROKER: %s\n", mes->payload ? (char *)mes->payload : "CONNECT DISMISS");
 
     return con;
 }
 
-void clientDoDisconnect(mqtt_connection *con){
+void clientDoDisconnect(mqtt_connection *con)
+{
     mynet_close(con);
 }
 void clientDoPulish()
 {
     mqtt_connection *con = clientDoConnect();
 
-    message* inMes = mes_new();
-    message* outMes = mes_new();
-    
-    // handle input topic for keyboard
+    message *inMes = mes_new();
+    message *outMes = mes_new();
 
-    char* topic = "home/bulb";
+    // handle input topic for keyboard
+    char *topic = "home/bulb";
     char data[] = "it is lower enerygy";
-    mes_PUB(outMes,topic, 0, data, strlen(data));
+    mes_PUB(outMes, topic, FLAG_PUB, data, strlen(data));
 
     //send PUB
     mes_send(con, outMes);
@@ -73,35 +73,41 @@ void clientDoPulish()
 
     mes_free(outMes);
     mes_free(inMes);
-
 }
 
-
-void clientDoSub(){
+void clientDoSub()
+{
     mqtt_connection *con = clientDoConnect();
-    message* inMes = mes_new();
-    message* outMes = mes_new();
-    
-    // handle input topic for keyboard
-    char* topic = "home/bulb";
-    mes_SUB(outMes, 1, NULL, topic);
+    message *inMes = mes_new();
+    message *outMes = mes_new();
 
+    // handle input topic for keyboard
+    char *topic = "home/bulb";
+    mes_SUB(outMes, FLAG_SUB, NULL, topic);
 
     //SEND
     mes_send(con, outMes);
-
     //recv ack
     mes_recv(con, inMes);
+
     printf("Subcribed topic: %s\n", topic);
-    
 }
 
+int main(int agrc, char *argv[])
+{
+    char cmd[50];
+    printf("input your command: ");
+    gets(cmd);
 
-int main(int agrc, char* argv[]){
-    printf("%d", agrc);
-    switch (agrc)
+    int todo = 0;
+    if (strcmp(cmd, "pub"))
+        todo = 1; // pub
+    else if (strcmp(cmd, "sub"))
+        todo = 2; // sub
+
+    switch (todo)
     {
-    case 1: 
+    case 1:
         clientDoPulish();
         break;
     case 2:
