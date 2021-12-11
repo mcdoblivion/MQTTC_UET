@@ -14,7 +14,7 @@ void topic_node_add_sub(topic_node *n, subcriber *s)
 {
     s->node = n;
     subcriber *ptr = n->sub_list;
-    ptr = &s;
+    ptr = s;
     memcpy(n->sub_list, ptr, 10);
     // need to edit soon
 }
@@ -36,16 +36,16 @@ topic_tree *topic_new_tree()
     return tree;
 }
 
-void topic_extract_token(char *topic, int *len, char **first_topic)
+void topic_extract_token(char *topic, int len, char *first_topic)
 {
     char *token;
     const char s[2] = "/";
     token = strtok(topic, s);
-    *first_topic = token;
-    *len = 0;
+    ///first_topic = token;
+    len = 0;
     while (token != NULL)
     {
-        *len++;
+        len++;
         //printf(" %s\n", token);
         token = strtok(NULL, s);
     }
@@ -53,16 +53,16 @@ void topic_extract_token(char *topic, int *len, char **first_topic)
 
 void topic_add_sub(topic_tree *tree, subcriber *subcriber)
 {
-    char *first_topic;
+    char *first_topic = NULL;
     int len = 0;
     char *topic = subcriber_get_topic(subcriber);
     topic_extract_token(topic, len, first_topic);
 
-    topic_node *cur_topic = &tree->root;
+    topic_node *cur_topic = tree->root; ///////////////// need to check
     while (len > 0)
     {
         len--;
-        cur_topic = cur_topic + strlen(cur_topic) + 1;
+       // cur_topic = cur_topic + strlen(cur_topic) + 1;
         topic_node_add_sub(cur_topic, subcriber);
     }
     free(first_topic);
@@ -71,7 +71,7 @@ void topic_add_sub(topic_tree *tree, subcriber *subcriber)
 void topic_rmv_sub(topic_tree *tree, subcriber *subcriber)
 {
     topic_node *node = subcriber->node;
-    char *first_topic;
+    char *first_topic = NULL;
     int len = 0;
     char *topic = subcriber_get_topic(subcriber);
     topic_extract_token(topic, len, first_topic);
@@ -82,11 +82,12 @@ void topic_rmv_sub(topic_tree *tree, subcriber *subcriber)
 char *topic_node_find_sub(topic_node *node, char *first_topic, int len)
 {
     printf("thisnotthing");
+    return first_topic;
 }
 
 char *topic_tree_find_sub(topic_tree *tree, char *topic)
 {
-    char *first_topic;
+    char *first_topic = NULL;
     int len = 0;
     topic_extract_token(topic, len, first_topic);
 

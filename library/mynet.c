@@ -138,8 +138,8 @@ void conn_close(mqtt_connection* connection){
     if(connection->sockfd >0){
         printf("Closing connection with %s\n", inet_ntoa(connection->addr->sin_addr));
     }
-
-    connection->sockfd = NULL;
+    close(connection->sockfd);
+    connection->sockfd = 0;
 }
 
 void mynet_read(mqtt_connection* connection, void* recvBuf, size_t size){
@@ -150,7 +150,7 @@ void mynet_read(mqtt_connection* connection, void* recvBuf, size_t size){
     int recvSize = read(connection->sockfd, recvBuf, size);
     
     if(recvSize < 0) {
-        print("error");
+        printf("error");
     }
     else 
         printf("ok mynet_read\n");
@@ -165,9 +165,16 @@ void mynet_write(mqtt_connection* connection, void* sentBuf, size_t size){
     int sentSize = write(connection->sockfd, sentBuf, size);
     
     if(sentSize < 0) {
-        print("error");
+        printf("error");
     }
     else 
         printf("ok mynet_write\n");
+
+}
+
+void mynet_close(mqtt_connection* connection){
+    printf("closing");
+    close(connection->sockfd);
+    connection->sockfd = 0;
 
 }

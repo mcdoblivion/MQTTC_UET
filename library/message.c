@@ -19,11 +19,11 @@ const char *mes_type_tostring(mqtt_mes_type type)
     return mes_type_text[(int)type];
 }
 
-variable_header *variable_header_new(char *key, char *data)
+variable_header *variable_header_new(char* key, uint8_t *var_header_data)
 {
-    variable_header *newVarHeader = (variable_header *)malloc(sizeof(variable_header));
+    variable_header *newVarHeader = (variable_header *)malloc(sizeof(var_header_data));
     newVarHeader->key = key;
-    newVarHeader->data = data;
+    newVarHeader->data = var_header_data;
     return newVarHeader;
 }
 
@@ -35,7 +35,7 @@ message *mes_new()
         printf("fail when init message\n");
         return NULL;
     }
-    memset(newMes, 0, sizeof(newMes));
+    memset(newMes, 0, sizeof(message));
     return newMes;
 }
 
@@ -61,13 +61,10 @@ void mes_set_flag(message *mes, uint16_t flag)
 {
     mes->flag = flag;
 }
-void mes_set_variable_header(message *mes, char *key, char *data)
+void mes_set_variable_header(message *mes, char* key, uint8_t *var_header_data)
 {
-    uint16_t key_len = strlen(key);
-    uint16_t data_len = strlen(data);
-
     variable_header *vh = NULL;
-    vh = variable_header_new(key, data);
+    vh = variable_header_new(key, var_header_data);
     mes->variable_header = vh;
     mes->variable_size = strlen(vh->data);
 }
@@ -80,7 +77,7 @@ void mes_set_payload(message *mes, uint8_t *payload, uint32_t payload_size)
     }
     else
     {
-        mes->payload = (uint8_t *)mem__malloc(sizeof(uint8_t) * payload_size);
+        mes->payload = (uint8_t *)malloc(sizeof(uint8_t) * payload_size);
         mes->payload_size = payload_size;
         memcpy(mes->payload, payload, payload_size);
     }
@@ -91,7 +88,7 @@ void mes_CON(message *mes, uint8_t *payload_data, uint32_t payload_size)
     mes_set_flag(mes, FLAG_CON);
     mes_set_message_type(mes, CON);
     // lack of set var header ????
-    mes_set_payload(mes, payload_size, payload_data);
+    mes_set_payload(mes, payload_data, payload_size);
 }
 
 void mes_PUB(message *mes, char *topic, uint8_t flag, uint8_t *payload, uint32_t size)

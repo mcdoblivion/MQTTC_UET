@@ -35,7 +35,7 @@ void client_free(client* client){
 void client_receive(client* client, message* mes){
     uint16_t fixed_header[FIXED_HEADER_SIZE];
     size_t read_size = 0;
-    mynet_read(client->connection, fixed_header, &read_size);
+    mynet_read(client->connection, fixed_header, read_size);
 
     uint16_t mes_type;
     uint16_t variable_header_size;
@@ -49,8 +49,8 @@ void client_receive(client* client, message* mes){
     mes_set_flag(mes, flag);
 
     //set variable header
-    uint8_t var_h_buff = malloc(sizeof(uint8_t) * variable_header_size);
-    mynet_read(client->connection, var_h_buff, &read_size);
+    uint8_t* var_h_buff = (uint8_t*)malloc(sizeof(uint8_t) * variable_header_size);
+    mynet_read(client->connection, var_h_buff, read_size);
 
 //    mes_set_variable_header();
 

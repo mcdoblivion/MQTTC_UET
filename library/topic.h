@@ -25,7 +25,7 @@ struct topic_tree
 };
 
 topic_tree *topic_new_tree();
-void topic_extract_token(char *topic, int *len, char **first_topic);
+void topic_extract_token(char *topic, int len, char *first_topic);
 void topic_add_sub(topic_tree *tree, subcriber *subcriber);
 void topic_rmv_sub(topic_tree *tree, subcriber *subcriber);
 char *topic_node_find_sub(topic_node *node, char *first_topic, int len);

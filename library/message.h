@@ -43,7 +43,7 @@ typedef enum
 typedef struct variable_header
 {
     char *key;
-    char *data;
+    uint8_t *data;
 } variable_header;
 
 typedef struct message
@@ -58,20 +58,20 @@ typedef struct message
     variable_header *variable_header;
 
     //payload
-    uint8_t payload;
+    uint8_t* payload;
 
 } message;
 
 message *mes_new();
 const char *mes_type_tostring(mqtt_mes_type type);
-variable_header *variable_header_new(char *key, char *data);
+variable_header *variable_header_new(char* key, uint8_t *var_header_data);
 void mes_free(message *mes);
 
 // set and get
 variable_header *mes_get_var_header_data(message *mes);
 void mes_set_message_type(message *mes, uint8_t mes_type);
 void mes_set_flag(message *mes, uint16_t flag);
-void mes_set_variable_header(message *mes, char *key, char *data);
+void mes_set_variable_header(message *mes, char* key, uint8_t *var_header_data);
 void mes_set_payload(message *mes, uint8_t *payload, uint32_t payload_size);
 
 //classify type of mes

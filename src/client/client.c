@@ -62,7 +62,7 @@ void clientDoPulish()
     // handle input topic for keyboard
     char *topic = "home/bulb";
     char data[] = "it is lower enerygy";
-    mes_PUB(outMes, topic, FLAG_PUB, data, strlen(data));
+    mes_PUB(outMes, topic, FLAG_PUB, NULL, strlen(data));
 
     //send PUB
     mes_send(con, outMes);

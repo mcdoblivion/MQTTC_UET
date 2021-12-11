@@ -59,8 +59,9 @@ void handleUNSUB(client *cli)
 
 }
 
-void todoHandleClient(client *cli)
+void* todoHandleClient(void *arg)
 {
+    client *cli = (client *)arg;
     broker *mybroker = cli->broker;
     while (true)
     {
