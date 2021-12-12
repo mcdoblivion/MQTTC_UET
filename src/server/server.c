@@ -26,9 +26,9 @@
 #define DEFAULT_PORT 4445
 #define DEFAULT_ADDR "127.0.0.1"
 
-broker *mybroker = NULL;
+broker *my_broker = NULL;
 
-void serverDoSentAck(client *cli, message *mesIn, char *msg)
+void serverDoSendAck(client *cli, message *mesIn, char *msg)
 {
     // message *mesOut = NULL;
     // message *mesOut = cli->outcome;
@@ -36,15 +36,15 @@ void serverDoSentAck(client *cli, message *mesIn, char *msg)
     // client_send(cli, mesOut);
 }
 
-void serverHandleCON(client *cli)
+void serverHandleConnection(client *cli)
 {
     //guiwr laij thoong tin vef broker
-    printf("serverHandleCON");
+    printf("serverHandleConnection");
 }
 
-void serverHandlePUB(client *cli)
+void serverHandlePublisher(client *cli)
 {
-    printf("serverHandleCON");
+    printf("serverHandleConnection");
 
     // message *in = cli->income;
 
@@ -55,24 +55,24 @@ void serverHandlePUB(client *cli)
     // after that : doBrokerSendMessage(cli, sub, mes)
 }
 
-void serverHandleSUB(client *cli)
+void serverHandleSubscriber(client *cli)
 {
-    printf("serverHandleCON");
+    printf("serverHandleConnection");
 
     //find topic in "income"->var_header
     // call client_sub(cli, topic_value)
-    // call serverDoSentAck(client* cli, cli->income, char* msg)
+    // call serverDoSendAck(client* cli, cli->income, char* msg)
 }
 
-void handleUNSUB(client *cli)
+void handleUnsubscribe(client *cli)
 {
-    printf("serverHandleCON");
+    printf("serverHandleConnection");
 }
 
 void *todoHandleClient(void *arg)
 {
     client *cli = (client *)arg;
-    broker *mybroker = cli->broker;
+    broker *my_broker = cli->broker;
     while (1)
     {
         printf("loop\n"); 
@@ -81,16 +81,16 @@ void *todoHandleClient(void *arg)
         switch (cli->income->mes_type)
         {
         case CON:
-            serverHandleCON(cli);
+            serverHandleConnection(cli);
             break;
         case PUB:
-            serverHandlePUB(cli);
+            serverHandlePublisher(cli);
             break;
         case SUB:
-            serverHandleSUB(cli);
+            serverHandleSubscriber(cli);
             break;
         case UNSUB:
-            handleUNSUB(cli);
+            handleUnsubscribe(cli);
             break;
         default:
             printf("error when read message type from client\n");
@@ -102,13 +102,13 @@ void *todoHandleClient(void *arg)
 
 int main(int argc, char *argv[])
 {
-    mybroker = initBroker(DEFAULT_ADDR, DEFAULT_PORT);
-    client *myclient = NULL;
+    my_broker = initBroker(DEFAULT_ADDR, DEFAULT_PORT);
+    client *my_client = NULL;
     pthread_t tid;
 
     while (1)
     {
-        myclient = doBrokerAccept(mybroker);
-        pthread_create(&tid, NULL, &todoHandleClient, (void *)myclient);
+        my_client = doBrokerAccept(my_broker);
+        pthread_create(&tid, NULL, &todoHandleClient, (void *)my_client);
     }
 }
