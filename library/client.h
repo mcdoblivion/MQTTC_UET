@@ -9,6 +9,8 @@
 #include "broker.h"
 #include "subcriber.h"
 
+// typedef struct client client;
+
 struct client {
     char id[5];
     broker* broker;

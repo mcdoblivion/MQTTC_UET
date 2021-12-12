@@ -1,7 +1,13 @@
-#include "message.h"
-#include <string.h>
 #include "mqtt.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include "mynet.h"
+#include "message.h"
 
 static const char *mes_type_text[] = {
     "CON",
@@ -12,7 +18,8 @@ static const char *mes_type_text[] = {
     "SUBACK",
     "UNSUB",
     "UNSUBACK",
-    "DISCON"};
+    "DISCON"
+};
 
 const char *mes_type_tostring(mqtt_mes_type type)
 {
@@ -66,7 +73,7 @@ void mes_set_variable_header(message *mes, char* key, uint8_t *var_header_data)
     variable_header *vh = NULL;
     vh = variable_header_new(key, var_header_data);
     mes->variable_header = vh;
-    mes->variable_size = strlen(vh->data);
+    mes->variable_size = strlen((char*)vh->data);
 }
 
 void mes_set_payload(message *mes, uint8_t *payload, uint32_t payload_size)
@@ -96,7 +103,9 @@ void mes_PUB(message *mes, char *topic, uint8_t flag, uint8_t *payload, uint32_t
     // on message publish, payload is content of message which will be published to topic
     mes_set_flag(mes, flag);
     mes_set_message_type(mes, PUB);
-    mes_set_variable_header(mes, "q-topic", topic);
+    mes_set_variable_header(mes, "q-topic", NULL);
+    // mes_set_variable_header(mes, "q-topic", topic);
+
     mes_set_payload(mes, payload, size);
 }
 
@@ -107,9 +116,12 @@ void mes_SUB(message *mes, uint8_t flag, char *mes_id, char *topic)
 
     if (topic)
     {
-        mes_set_variable_header(mes, "mes-id", mes_id);
+        // mes_set_variable_header(mes, "mes-id", mes_id);
+        mes_set_variable_header(mes, "mes-id", NULL);
         uint8_t payload_size = strlen(topic);
-        mes_set_payload(mes, topic, payload_size);
+        // mes_set_payload(mes, topic, payload_size);
+        mes_set_payload(mes, NULL, payload_size);
+
     }
 }
 
@@ -119,9 +131,13 @@ void mes_UNSUB(message *mes, uint8_t flag, char *mes_id, char *topic)
     mes_set_message_type(mes, UNSUB);
     if (topic)
     {
-        mes_set_variable_header(mes, "mes-id", mes_id);
+        // mes_set_variable_header(mes, "mes-id", mes_id);
+        mes_set_variable_header(mes, "mes-id", NULL);
+
         uint8_t payload_size = strlen(topic);
-        mes_set_payload(mes, topic, payload_size);
+        // mes_set_payload(mes, topic, payload_size);
+        mes_set_payload(mes, NULL, payload_size);
+
     }
 }
 
@@ -136,7 +152,9 @@ void mes_ACK(message *dst, message *src, char *msg)
     {
         msg = "BROKER received msg";
         mes_set_payload(dst, (uint8_t *)msg, strlen(msg));
-        mes_set_variable_header(dst, "mes-ack", "200 OK");
+        // mes_set_variable_header(dst, "mes-ack", "200 OK");
+        mes_set_variable_header(dst, "mes-ack", NULL);
+
     }
 }
 
@@ -194,7 +212,7 @@ void mes_recv(mqtt_connection *con, message *mes)
     // set variable_header_data
     uint8_t* variable_header_data = (uint8_t*)malloc(sizeof(uint8_t) * vars_size);
     mynet_read(con, variable_header_data, vars_size);
-    mes_set_variable_header(mes, variable_header_data, vars_size);
+    mes_set_variable_header(mes, "mes_recv" , variable_header_data);
 //   set payload_data
     uint8_t* payload_data = (uint8_t*)malloc(sizeof(uint8_t) * payload_size);
     mynet_read(con, payload_data, payload_size);

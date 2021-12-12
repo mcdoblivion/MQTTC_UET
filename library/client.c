@@ -1,8 +1,11 @@
-#include "client.h"
-#include "broker.h"
-#include "mynet.h"
-#include "message.h"
 #include <pthread.h>
+#include "mqtt.h"
+#include "message.h"
+#include "topic.h"
+#include "mynet.h"
+#include "broker.h"
+#include "subcriber.h"
+#include "client.h"
 
 
 void rand_str_id(char *dest, size_t length) {

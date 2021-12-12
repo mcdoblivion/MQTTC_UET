@@ -1,6 +1,6 @@
+#include "mqtt.h"
 #include "topic.h"
 #include "string.h"
-#include "mqtt.h"
 #include "subcriber.h"
 
 topic_node *topic_node_new()

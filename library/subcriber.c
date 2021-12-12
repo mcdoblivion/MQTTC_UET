@@ -10,7 +10,7 @@ char* subcriber_init_id(char* topic, client* client){
     memmove(id, client->id, client_id_len);
     *(id + client_id_len) = "-";
     memmove(id + client_id_len + 1, topic, topic_name_len);
-    *(id + client_id_len +  topic_name_len + 1) = "\0";
+    *(id + client_id_len +  topic_name_len + 1) = '\0';
 
     return id;
 }

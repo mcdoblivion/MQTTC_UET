@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "mynet.h"
 
 #define FIXED_HEADER_SIZE 16 // bytes
 #define OFFSET_MESSAGE_TYPE 0
@@ -40,13 +41,13 @@ typedef enum
 
 } mqtt_flag;
 
-typedef struct variable_header
+struct variable_header
 {
     char *key;
     uint8_t *data;
-} variable_header;
+};
 
-typedef struct message
+struct message
 {
     // fixed header
     uint8_t mes_type;
@@ -60,7 +61,7 @@ typedef struct message
     //payload
     uint8_t* payload;
 
-} message;
+};
 
 message *mes_new();
 const char *mes_type_tostring(mqtt_mes_type type);

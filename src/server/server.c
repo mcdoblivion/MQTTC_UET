@@ -8,7 +8,6 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
 #include "mqtt.h"
 #include "client.h"
 #include "broker.h"
@@ -92,7 +91,6 @@ void* todoHandleClient(void *arg)
 int main(int argc, char *argv[])
 {
     mybroker = initBroker(DEFAULT_ADDR, DEFAULT_PORT);
-    
     client *myclient = NULL;
     pthread_t tid;
     

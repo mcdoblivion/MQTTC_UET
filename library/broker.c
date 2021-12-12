@@ -7,7 +7,6 @@
 #include "topic.h"
 
 
-
 void doCloseBroker(broker *broker, uint8_t lock)
 {
     if (lock)
@@ -24,7 +23,6 @@ broker *initBroker(char *host, uint16_t port)
 {
     // construct broker b
     broker *b = (broker *)malloc(sizeof(broker));
-    
     if (!b)
         return NULL;
     else
@@ -38,7 +36,7 @@ broker *initBroker(char *host, uint16_t port)
     //init listener
     mqtt_connection *listener = mynet_listen(host, port);
     b->listener = listener;
-
+    b->isActive = true;
     return b;
 }
 
@@ -66,7 +64,9 @@ client *doBrokerAccept(broker *b)
 void doBrokerSendMessage(client *cliSender, subcriber *subcriber, message *mes)
 {
     broker *b = cliSender->broker;
-    mes_set_variable_header(mes, "topic", subcriber_get_topic(subcriber));
+    // mes_set_variable_header(mes, "topic", subcriber_get_topic(subcriber));
+    mes_set_variable_header(mes, "topic", NULL);
+
 
     client *cli;
     char *clientId = subcriber->client->id;
@@ -79,7 +79,9 @@ void doBrokerSendMessage(client *cliSender, subcriber *subcriber, message *mes)
         char *srcIP = inet_ntoa(cliSender->connection->addr->sin_addr);
         char *srcAddr = (char *)malloc(sizeof(char) * (strlen(srcIP) + 10));
         sprintf(srcAddr, "%s:%d", srcIP, ntohs(cliSender->connection->addr->sin_port));
-        mes_set_variable_header(mes, "from:", srcAddr);
+        // mes_set_variable_header(mes, "from:", srcAddr);
+        mes_set_variable_header(mes, "from:", NULL);
+
         free(srcAddr); //consider rmv this line?
         client_send(cliRecv, mes);
     }

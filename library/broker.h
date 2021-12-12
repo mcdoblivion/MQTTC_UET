@@ -10,15 +10,14 @@
 #include "subcriber.h"
 
 // model
-typedef struct broker
+struct broker
 {
     mqtt_connection *listener;
     pthread_mutex_t mutex;
     topic_tree *topics;
     client *clientList;
     bool isActive;
-
-} broker;
+};
 
 // funtion
 void doCloseBroker(broker *broker, uint8_t lock);
