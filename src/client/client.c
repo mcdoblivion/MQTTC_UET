@@ -56,23 +56,23 @@ void clientDoPulish()
 {
     mqtt_connection *con = clientDoConnect();
 
-    message *inMes = mes_new();
-    message *outMes = mes_new();
+    // message *inMes = mes_new();
+    // message *outMes = mes_new();
 
-    // handle input topic for keyboard
-    char *topic = "home/bulb";
-    char data[] = "it is lower enerygy";
-    mes_PUB(outMes, topic, FLAG_PUB, NULL, strlen(data));
+    // // handle input topic for keyboard
+    // char *topic = "home/bulb";
+    // char data[] = "it is lower enerygy";
+    // mes_PUB(outMes, topic, FLAG_PUB, NULL, strlen(data));
 
-    //send PUB
-    mes_send(con, outMes);
-    //receive ack
-    mes_recv(con, inMes);
+    // //send PUB
+    // mes_send(con, outMes);
+    // //receive ack
+    // mes_recv(con, inMes);
 
-    printf("Published to \"%s\"\n", topic);
+    // printf("Published to \"%s\"\n", topic);
 
-    mes_free(outMes);
-    mes_free(inMes);
+    // mes_free(outMes);
+    // mes_free(inMes);
 }
 
 void clientDoSub()

@@ -30,12 +30,16 @@ mqtt_connection *conn_init(const char *host, uint16_t port, mqtt_status status)
     //create connection
     mqtt_connection *connection = (mqtt_connection *)malloc(sizeof(mqtt_connection));
 
+    memset(connection, 0, sizeof(*connection));
     connection->sockfd = connSock;
     connection->addr = addr;
     connection->status = status;
 
     if (!connection)
-        return NULL;
+        {
+            printf("conn_init fail\n");
+            return NULL;
+        }
     else
         return connection;
 }
@@ -60,8 +64,9 @@ mqtt_connection *mynet_connect(const char *host, uint16_t port)
         printf("Error creating socket.");
         return NULL;
     }
+  
     //procedure for connecting to server
-    if (connect(connection->sockfd, (struct sockaddr *)connection->addr, sizeof(connection->addr)) < 0)
+    if (connect(connection->sockfd, (struct sockaddr *)connection->addr, sizeof(*(connection->addr))) < 0)
     {
         // error
         printf("Error when connecting!");
@@ -70,7 +75,7 @@ mqtt_connection *mynet_connect(const char *host, uint16_t port)
     }
     //connect successfully
     connection->status = CONNECTED;
-    printf("Connected to server mqtt %s:%d", inet_ntoa(connection->addr->sin_addr), ntohs(connection->addr->sin_port));
+    printf("Connected to MQTT server %s:%d\n", inet_ntoa(connection->addr->sin_addr), ntohs(connection->addr->sin_port));
 
     return connection;
 }
