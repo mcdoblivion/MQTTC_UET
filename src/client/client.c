@@ -1,4 +1,13 @@
-//this is file client
+/**
+ * @file client.c
+ * 
+ * Client program
+ * Nguyen Minh Thang
+ * Nguyen Hong Thai
+ * Tran Nguyen Phuong Nam
+ * Dong Minh Cuong
+ */
+
 #include "mqtt.h"
 #include "broker.h"
 #include "message.h"

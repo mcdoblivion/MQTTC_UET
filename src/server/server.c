@@ -1,4 +1,13 @@
-//this is file server
+/**
+ * @file server.c
+ * 
+ * Server program
+ * Nguyen Minh Thang
+ * Nguyen Hong Thai
+ * Tran Nguyen Phuong Nam
+ * Dong Minh Cuong
+ */
+
 #include <arpa/inet.h>
 #include <errno.h>
 #include <pthread.h>
