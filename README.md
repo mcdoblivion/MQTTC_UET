@@ -1,5 +1,10 @@
 # MQTTC_UET
 This is project of **Network Programming**
+### how to compiler project
+mkdir build
+cd build
+cmake ..
+cmake --build .
 
 ### 1. Định dạng gói tin
 

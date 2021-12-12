@@ -50,7 +50,6 @@ mqtt_connection *conn_init(const char *host, uint16_t port, mqtt_status status)
     }
     else
     {
-        printf("conn_init ok %d\n", connection->status);
         return connection;
     }
 }
@@ -176,12 +175,22 @@ void mynet_read(mqtt_connection *connection, void *recvBuf, size_t size)
     if (size <= 0)
         printf("error\n");
 
+<<<<<<< HEAD
     int recvSize = read(connection->sockfd, recvBuf, size);
     printf("size: %d", recvSize);
 
     if (recvSize < 0)
     {
         printf("error mynet_read");
+=======
+    else
+    {
+        int recvSize = read(connection->sockfd, recvBuf, size);
+        if (recvSize < 0)
+        {
+            printf("error mynet_read");
+        }
+>>>>>>> 544d208 (update readme)
     }
     else
         printf("ok mynet_read\n");
@@ -193,12 +202,22 @@ void mynet_write(mqtt_connection *connection, void *sentBuf, size_t size)
     if (size <= 0)
         printf("error\n");
 
+<<<<<<< HEAD
     int sentSize = write(connection->sockfd, sentBuf, size);
     printf("size: %d", sentSize);
 
     if (sentSize < 0)
     {
         printf("error");
+=======
+    else
+    {
+        int sentSize = write(connection->sockfd, sentBuf, size);
+        if (sentSize < 0)
+        {
+            printf("error mynet_write\n");
+        }
+>>>>>>> 544d208 (update readme)
     }
     else
         printf("ok mynet_write\n");
