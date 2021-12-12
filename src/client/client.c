@@ -43,7 +43,7 @@ mqtt_connection *clientDoConnect()
     if (!mes)
         exit(1);
 
-    char *greeting = "i am client";
+    char *greeting = "I am Client";
     mes_CON(mes, (uint8_t *)greeting, strlen(greeting));
     //send CON
     mes_send(con, mes);
@@ -60,7 +60,8 @@ void clientDoDisconnect(mqtt_connection *con)
 {
     mynet_close(con);
 }
-void clientDoPulish()
+
+void clientDoPublish()
 {
     mqtt_connection *conn = clientDoConnect();
 
@@ -69,7 +70,7 @@ void clientDoPulish()
 
     // // handle input topic for keyboard
     // char *topic = "home/bulb";
-    // char data[] = "it is lower enerygy";
+    // char data[] = "it is lower energy";
     // mes_PUB(outMes, topic, FLAG_PUB, NULL, strlen(data));
 
     // //send PUB
@@ -83,7 +84,7 @@ void clientDoPulish()
     // mes_free(inMes);
 }
 
-void clientDoSub()
+void clientDoSubscribe()
 {
     mqtt_connection *conn = clientDoConnect();
     // message *inMes = mes_new();
@@ -98,32 +99,32 @@ void clientDoSub()
     // //recv ack
     // mes_recv(con, inMes);
 
-    // printf("Subcribed topic: %s\n", topic);
+    // printf("Subcribbed topic: %s\n", topic);
 }
 
 int main(int agrc, char *argv[])
 {
-    char cmd[50] = "pub";
-    
-    printf("input your command: ");
+    char cmd[50] = "PUB";
+
+    printf("Enter your command: ");
     gets(cmd);
 
     int todo = 0;
-    if (strcmp(cmd, "pub") == 0)
-        todo = 1; // pub
-    else if (strcmp(cmd, "sub") == 0)
-        todo = 2; // sub
+    if (strcmp(cmd, "PUB") == 0)
+        todo = 1; // Publisher
+    else if (strcmp(cmd, "SUB") == 0)
+        todo = 2; // Subscriber
 
     switch (todo)
     {
     case 1:
-        clientDoPulish();
+        clientDoPublish();
         break;
     case 2:
-        clientDoSub();
+        clientDoSubscribe();
         break;
     default:
-        printf("wrong");
+        printf("Wrong command!");
         break;
     }
 }
