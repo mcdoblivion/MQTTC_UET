@@ -36,14 +36,14 @@ mqtt_connection *clientDoConnect()
 
     char *greeting = "i am client";
     mes_CON(mes, (uint8_t *)greeting, strlen(greeting));
-
+    printf("mes type %s\n", mes->mes_type);
     //send CON
-    mes_send(con, mes);
+    // mes_send(con, mes);
 
     //receive CONACK
-    mes_recv(con, mes);
+    // mes_recv(con, mes);
 
-    printf("CONACK FROM BROKER: %s\n", mes->payload ? (char *)mes->payload : "CONNECT DISMISS");
+    // printf("CONACK FROM BROKER: %s\n", mes->payload ? (char *)mes->payload : "CONNECT DISMISS");
 
     return con;
 }
@@ -54,7 +54,7 @@ void clientDoDisconnect(mqtt_connection *con)
 }
 void clientDoPulish()
 {
-    mqtt_connection *con = clientDoConnect();
+    mqtt_connection *conn = clientDoConnect();
 
     // message *inMes = mes_new();
     // message *outMes = mes_new();
@@ -77,20 +77,20 @@ void clientDoPulish()
 
 void clientDoSub()
 {
-    mqtt_connection *con = clientDoConnect();
-    message *inMes = mes_new();
-    message *outMes = mes_new();
+    mqtt_connection *conn = clientDoConnect();
+    // message *inMes = mes_new();
+    // message *outMes = mes_new();
 
-    // handle input topic for keyboard
-    char *topic = "home/bulb";
-    mes_SUB(outMes, FLAG_SUB, NULL, topic);
+    // // handle input topic for keyboard
+    // char *topic = "home/bulb";
+    // mes_SUB(outMes, FLAG_SUB, NULL, topic);
 
-    //SEND
-    mes_send(con, outMes);
-    //recv ack
-    mes_recv(con, inMes);
+    // //SEND
+    // mes_send(con, outMes);
+    // //recv ack
+    // mes_recv(con, inMes);
 
-    printf("Subcribed topic: %s\n", topic);
+    // printf("Subcribed topic: %s\n", topic);
 }
 
 int main(int agrc, char *argv[])
@@ -101,9 +101,9 @@ int main(int agrc, char *argv[])
     gets(cmd);
 
     int todo = 0;
-    if (strcmp(cmd, "pub"))
+    if (strcmp(cmd, "pub") == 0)
         todo = 1; // pub
-    else if (strcmp(cmd, "sub"))
+    else if (strcmp(cmd, "sub") == 0)
         todo = 2; // sub
 
     switch (todo)

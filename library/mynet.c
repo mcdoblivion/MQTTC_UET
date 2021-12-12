@@ -10,38 +10,49 @@
 
 mqtt_connection *conn_init(const char *host, uint16_t port, mqtt_status status)
 {
+
     struct sockaddr_in *addr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
 
-    if (addr != NULL)
+    if (!addr)
     {
-        // memset(addr, 0, sizeof(addr));
-        addr->sin_family = AF_INET;
-        addr->sin_addr.s_addr = inet_addr(host);
-        addr->sin_port = htons(port);
+        return NULL;
     }
-    
+
+    memset(addr, 0, sizeof(*addr));
+    addr->sin_family = AF_INET;
+    addr->sin_addr.s_addr = inet_addr(host);
+    addr->sin_port = htons(port);
+
     int connSock = socket(AF_INET, SOCK_STREAM, 0);
     if (connSock < 0)
     {
         printf("Error when creating socket\n");
-        exit(1);
+        free(addr);
+        return NULL;
     }
 
     //create connection
     mqtt_connection *connection = (mqtt_connection *)malloc(sizeof(mqtt_connection));
+    if (!connection)
+    {
+        return NULL;
+    }
 
-    memset(connection, 0, sizeof(*connection));
     connection->sockfd = connSock;
     connection->addr = addr;
     connection->status = status;
 
     if (!connection)
-        {
-            printf("conn_init fail\n");
-            return NULL;
-        }
+    {
+        free(addr);
+        printf("conn_init fail\n");
+        return NULL;
+    }
     else
+    {
+        printf("conn_init ok %d\n", connection->status);
         return connection;
+    }
 }
 
 void conn_free(mqtt_connection *connection)
@@ -59,20 +70,24 @@ mqtt_connection *mynet_connect(const char *host, uint16_t port)
 {
     // init connection
     mqtt_connection *connection = conn_init(host, port, CONNECTING);
+
     if (!connection)
     {
         printf("Error creating socket.");
+        conn_free(connection);
+        exit(1);
         return NULL;
     }
-  
     //procedure for connecting to server
     if (connect(connection->sockfd, (struct sockaddr *)connection->addr, sizeof(*(connection->addr))) < 0)
     {
         // error
         printf("Error when connecting!");
         conn_free(connection);
+        exit(1);
         return NULL;
     }
+
     //connect successfully
     connection->status = CONNECTED;
     printf("Connected to MQTT server %s:%d\n", inet_ntoa(connection->addr->sin_addr), ntohs(connection->addr->sin_port));
@@ -82,7 +97,7 @@ mqtt_connection *mynet_connect(const char *host, uint16_t port)
 
 mqtt_connection *mynet_listen(const char *host, uint16_t port)
 {
-    mqtt_connection *connection = conn_init(host, port, CONNECTING);
+    mqtt_connection *connection = conn_init(host, port, LISTEN);
     if (!connection)
     {
         printf("Error creating socket.");
@@ -90,13 +105,15 @@ mqtt_connection *mynet_listen(const char *host, uint16_t port)
         return NULL;
     }
 
-    if(bind(connection->sockfd,(struct sockaddr*)connection->addr, sizeof(*(connection->addr))) < 0) {
+    if (bind(connection->sockfd, (struct sockaddr *)connection->addr, sizeof(*(connection->addr))) < 0)
+    {
         perror("bind");
         conn_free(connection);
         return NULL;
     }
 
-    if(listen(connection->sockfd, 20) < 0) {
+    if (listen(connection->sockfd, 20) < 0)
+    {
         perror("listen");
         conn_free(connection);
         return NULL;
@@ -104,12 +121,13 @@ mqtt_connection *mynet_listen(const char *host, uint16_t port)
 
     printf("Broker is listening client on %s:%d\n", inet_ntoa(connection->addr->sin_addr), ntohs(connection->addr->sin_port));
     return connection;
-
 }
 
-mqtt_connection* mynet_accept(mqtt_connection* listener){
-    struct sockaddr_in* cliAddr = (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
-    if (!cliAddr) {
+mqtt_connection *mynet_accept(mqtt_connection *listener)
+{
+    struct sockaddr_in *cliAddr = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
+    if (!cliAddr)
+    {
         return NULL;
     }
 
@@ -118,70 +136,77 @@ mqtt_connection* mynet_accept(mqtt_connection* listener){
 
     int cliSock = -1;
     while (cliSock < 0)
-    {   
-        cliSock = accept(listener->sockfd, (struct sockaddr *) cliAddr, (socklen_t *)&socklen);
-        if(cliSock < 0){
+    {
+        cliSock = accept(listener->sockfd, (struct sockaddr *)cliAddr, (socklen_t *)&socklen);
+        if (cliSock < 0)
+        {
             perror("accept");
             return NULL;
         }
     }
-    
+
     printf("Broker has been initialized with client %s\n", inet_ntoa(cliAddr->sin_addr));
 
-    mqtt_connection* connection = (mqtt_connection*)malloc(sizeof(mqtt_connection));
+    mqtt_connection *connection = (mqtt_connection *)malloc(sizeof(mqtt_connection));
     connection->sockfd = cliSock;
     connection->addr = cliAddr;
     connection->status = CONNECTED;
 
-    if(!connection){
+    if (!connection)
+    {
         free(connection);
         return NULL;
     }
     return connection;
-
 }
 
-void conn_close(mqtt_connection* connection){
-    if(connection->sockfd >0){
+void conn_close(mqtt_connection *connection)
+{
+    if (connection->sockfd > 0)
+    {
         printf("Closing connection with %s\n", inet_ntoa(connection->addr->sin_addr));
     }
     close(connection->sockfd);
     connection->sockfd = 0;
 }
 
-void mynet_read(mqtt_connection* connection, void* recvBuf, size_t size){
-    
-    if(size <= 0)
+void mynet_read(mqtt_connection *connection, void *recvBuf, size_t size)
+{
+
+    if (size <= 0)
         printf("error\n");
-    
+
     int recvSize = read(connection->sockfd, recvBuf, size);
-    
-    if(recvSize < 0) {
-        printf("error");
+    printf("size: %d", recvSize);
+
+    if (recvSize < 0)
+    {
+        printf("error mynet_read");
     }
-    else 
+    else
         printf("ok mynet_read\n");
-
 }
 
-void mynet_write(mqtt_connection* connection, void* sentBuf, size_t size){
-    
-    if(size <= 0)
+void mynet_write(mqtt_connection *connection, void *sentBuf, size_t size)
+{
+
+    if (size <= 0)
         printf("error\n");
-    
+
     int sentSize = write(connection->sockfd, sentBuf, size);
-    
-    if(sentSize < 0) {
+    printf("size: %d", sentSize);
+
+    if (sentSize < 0)
+    {
         printf("error");
     }
-    else 
+    else
         printf("ok mynet_write\n");
-
 }
 
-void mynet_close(mqtt_connection* connection){
+void mynet_close(mqtt_connection *connection)
+{
     printf("closing");
     close(connection->sockfd);
     connection->sockfd = 0;
-
 }

@@ -58,7 +58,7 @@ client *doBrokerAccept(broker *b)
     client *cli = client_new(con, b);
 
     ///////////////////// why do you assign a cli to a pointer list?
-    b->clientList = cli;
+  //  b->clientList = cli;
     return cli;
 }
 
@@ -66,7 +66,7 @@ void doBrokerSendMessage(client *cliSender, subcriber *subcriber, message *mes)
 {
     broker *b = cliSender->broker;
     // mes_set_variable_header(mes, "topic", subcriber_get_topic(subcriber));
-    mes_set_variable_header(mes, "topic", NULL);
+    mes_set_variable_header(mes, NULL, NULL,NULL);
 
 
     client *cli;
@@ -81,7 +81,7 @@ void doBrokerSendMessage(client *cliSender, subcriber *subcriber, message *mes)
         char *srcAddr = (char *)malloc(sizeof(char) * (strlen(srcIP) + 10));
         sprintf(srcAddr, "%s:%d", srcIP, ntohs(cliSender->connection->addr->sin_port));
         // mes_set_variable_header(mes, "from:", srcAddr);
-        mes_set_variable_header(mes, "from:", NULL);
+        mes_set_variable_header(mes, NULL, NULL, NULL);
 
         free(srcAddr); //consider rmv this line?
         client_send(cliRecv, mes);

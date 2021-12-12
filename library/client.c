@@ -21,7 +21,7 @@ void rand_str_id(char *dest, size_t length) {
 }
 
 client* client_new(mqtt_connection* connection, broker* broker){
-    client* client = malloc(sizeof(client));
+    client* client = malloc(sizeof(struct client));
     rand_str_id(client->id, 5);
     client->connection = connection;
     client->broker= broker;
@@ -36,13 +36,13 @@ void client_free(client* client){
 }
 
 void client_receive(client* client, message* mes){
-    uint16_t fixed_header[FIXED_HEADER_SIZE];
+    uint8_t fixed_header[FIXED_HEADER_SIZE];
     size_t read_size = 0;
     mynet_read(client->connection, fixed_header, read_size);
 
-    uint16_t mes_type;
-    uint16_t variable_header_size;
-    uint16_t flag;
+    uint8_t mes_type;
+    uint8_t variable_header_size;
+    uint8_t flag;
     memcpy(&mes_type, fixed_header + OFFSET_MESSAGE_TYPE, sizeof(mes_type));
     memcpy(&variable_header_size, fixed_header+ OFFSET_REMAIN_VAR_SIZE, sizeof(variable_header_size));
     memcpy(&flag, fixed_header + OFFSET_FLAG, sizeof(flag));
@@ -62,13 +62,13 @@ void client_receive(client* client, message* mes){
 }
 
 void client_send(client* client, message* mes){
-    uint16_t fixed_header[FIXED_HEADER_SIZE];
+    uint8_t fixed_header[FIXED_HEADER_SIZE];
     size_t read_size = 0;
 
-    uint16_t mes_type;
-    uint16_t variable_header_size;
-    uint16_t flag;
-    uint16_t payload_size;
+    uint8_t mes_type;
+    uint8_t variable_header_size;
+    uint8_t flag;
+    uint8_t payload_size;
     memcpy(&mes_type, fixed_header+ OFFSET_MESSAGE_TYPE , sizeof(mes_type));
     memcpy(&variable_header_size, fixed_header + OFFSET_REMAIN_VAR_SIZE, sizeof(variable_header_size));
     memcpy(&flag, fixed_header + OFFSET_FLAG, sizeof(flag));

@@ -11,11 +11,11 @@
 #include <arpa/inet.h>
 #include "mynet.h"
 
-#define FIXED_HEADER_SIZE 16 // bytes
+#define FIXED_HEADER_SIZE 8 // bytes
 #define OFFSET_MESSAGE_TYPE 0
-#define OFFSET_FLAG 4
-#define OFFSET_REMAIN_VAR_SIZE 8
-#define OFFSET_REMAIN_PAYLOAD_SIZE 12
+#define OFFSET_FLAG 2
+#define OFFSET_REMAIN_VAR_SIZE 4
+#define OFFSET_REMAIN_PAYLOAD_SIZE 6
 
 typedef enum
 {
@@ -65,19 +65,20 @@ struct message
 
 message *mes_new();
 const char *mes_type_tostring(mqtt_mes_type type);
-variable_header *variable_header_new(char* key, uint8_t *var_header_data);
+variable_header *variable_header_new(char* key, uint8_t *var_header_data, uint8_t var_header_size);
 void mes_free(message *mes);
 
 // set and get
 variable_header *mes_get_var_header_data(message *mes);
 void mes_set_message_type(message *mes, uint8_t mes_type);
-void mes_set_flag(message *mes, uint16_t flag);
-void mes_set_variable_header(message *mes, char* key, uint8_t *var_header_data);
-void mes_set_payload(message *mes, uint8_t *payload, uint32_t payload_size);
+void mes_set_flag(message *mes, uint8_t flag);
+void mes_set_variable_header(message *mes, char* key, uint8_t *var_header_data, uint8_t var_header_size);
+
+void mes_set_payload(message *mes, uint8_t *payload, uint8_t payload_size);
 
 //classify type of mes
-void mes_CON(message *mes, uint8_t *info, uint32_t payload_size);
-void mes_PUB(message *mes, char *topic, uint8_t flag, uint8_t *payload, uint32_t size);
+void mes_CON(message *mes, uint8_t *info, uint8_t payload_size);
+void mes_PUB(message *mes, char *topic, uint8_t flag, uint8_t *payload, uint8_t size);
 void mes_SUB(message *mes, uint8_t flag, char *mes_id, char *topic);
 void mes_UNSUB(message *mes, uint8_t flag, char *mes_id, char *topic);
 void mes_ACK(message *dst, message *src, char *msg);

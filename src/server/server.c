@@ -57,7 +57,6 @@ void serverHandleSUB(client *cli)
 
 void handleUNSUB(client *cli)
 {
-    //
     printf("serverHandleCON");
 }
 
@@ -65,11 +64,11 @@ void *todoHandleClient(void *arg)
 {
     client *cli = (client *)arg;
     broker *mybroker = cli->broker;
-    printf("sdff"); //no
     while (1)
     {
-        //client_read(cli); // read a client
+        printf("loop\n"); 
         mes_recv(cli->connection, cli->income);
+        printf("mes type %d\n", cli->income->mes_type);
         switch (cli->income->mes_type)
         {
         case CON:
@@ -86,7 +85,7 @@ void *todoHandleClient(void *arg)
             break;
         default:
             printf("error when read message type from client\n");
-            break;
+            exit (1);
         }
     }
     pthread_detach(pthread_self());
