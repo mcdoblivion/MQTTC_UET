@@ -159,30 +159,10 @@ mqtt_connection *mynet_accept(mqtt_connection *listener)
     return connection;
 }
 
-void conn_close(mqtt_connection *connection)
-{
-    if (connection->sockfd > 0)
-    {
-        printf("Closing connection with %s\n", inet_ntoa(connection->addr->sin_addr));
-    }
-    close(connection->sockfd);
-    connection->sockfd = 0;
-}
-
 void mynet_read(mqtt_connection *connection, void *recvBuf, size_t size)
 {
-
     if (size <= 0)
-        printf("error\n");
-
-<<<<<<< HEAD
-    int recvSize = read(connection->sockfd, recvBuf, size);
-    printf("size: %d", recvSize);
-
-    if (recvSize < 0)
-    {
-        printf("error mynet_read");
-=======
+        return;
     else
     {
         int recvSize = read(connection->sockfd, recvBuf, size);
@@ -190,42 +170,31 @@ void mynet_read(mqtt_connection *connection, void *recvBuf, size_t size)
         {
             printf("error mynet_read");
         }
->>>>>>> 544d208 (update readme)
     }
-    else
-        printf("ok mynet_read\n");
 }
 
 void mynet_write(mqtt_connection *connection, void *sentBuf, size_t size)
 {
 
     if (size <= 0)
-        printf("error\n");
+        printf("error mynet_write, size < 0\n");
 
-<<<<<<< HEAD
-    int sentSize = write(connection->sockfd, sentBuf, size);
-    printf("size: %d", sentSize);
-
-    if (sentSize < 0)
-    {
-        printf("error");
-=======
     else
     {
         int sentSize = write(connection->sockfd, sentBuf, size);
         if (sentSize < 0)
         {
-            printf("error mynet_write\n");
+            printf("error mynet_write, sentSize <0\n");
         }
->>>>>>> 544d208 (update readme)
     }
-    else
-        printf("ok mynet_write\n");
 }
 
 void mynet_close(mqtt_connection *connection)
 {
-    printf("closing");
+    if (connection->sockfd > 0)
+    {
+        printf("Closing connection with %s\n", inet_ntoa(connection->addr->sin_addr));
+    }
     close(connection->sockfd);
     connection->sockfd = 0;
 }

@@ -78,7 +78,7 @@ void mes_set_payload(message *mes, uint8_t *payload, uint8_t payload_size);
 //classify type of mes
 void mes_CON(message *mes, uint8_t *info, uint8_t payload_size);
 void mes_PUB(message *mes, char *topic, uint8_t flag, uint8_t *payload, uint8_t size);
-void mes_SUB(message *mes, uint8_t flag, char *mes_id, char *topic);
+void mes_SUB(message *mes, uint8_t flag, uint8_t *payload, uint8_t size);
 void mes_UN_SUB(message *mes, uint8_t flag, char *mes_id, char *topic);
 void mes_ACK(message *dst, message *src, char *msg);
 

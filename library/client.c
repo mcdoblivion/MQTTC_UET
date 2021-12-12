@@ -55,37 +55,9 @@ void client_receive(client* client, message* mes){
     uint8_t* var_h_buff = (uint8_t*)malloc(sizeof(uint8_t) * variable_header_size);
     mynet_read(client->connection, var_h_buff, read_size);
 
-//    mes_set_variable_header();
-
-    // mynet_read(client->connection, mes->payload, &read_size);
 
 }
 
 void client_send(client* client, message* mes){
-    uint8_t fixed_header[FIXED_HEADER_SIZE];
-    size_t read_size = 0;
-
-    uint8_t mes_type;
-    uint8_t variable_header_size;
-    uint8_t flag;
-    uint8_t payload_size;
-    memcpy(&mes_type, fixed_header+ OFFSET_MESSAGE_TYPE , sizeof(mes_type));
-    memcpy(&variable_header_size, fixed_header + OFFSET_REMAIN_VAR_SIZE, sizeof(variable_header_size));
-    memcpy(&flag, fixed_header + OFFSET_FLAG, sizeof(flag));
-    memcpy(&payload_size, fixed_header + OFFSET_REMAIN_PAYLOAD_SIZE, sizeof(payload_size));
-
-//  net_write(conn, fixed_header, FIXED_HEADER_SIZE, &n_write, 1);
-    //     bpsp__byte* var_hdr_buf = (bpsp__byte*)mem__malloc(sizeof(bpsp__byte) * frame->vars_size);
-    //     s = var_header__to_bytes(frame->var_headers, var_hdr_buf);
-    //     s = net__write(conn, var_hdr_buf, frame->vars_size, &n_write, 1);
-    //      if (frame->data_size > 0) {
-    //     s = net__write(conn, frame->payload, frame->data_size, &n_write, 1);
-    //     frame->pos = (bpsp__uint32)n_write;
-    //     n_write = 0;
-    //     IFN_OK(s) {
-    //         //
-    //         return s;
-    //     }
-    // }
-
+    mes_send(client->connection, mes);
 }

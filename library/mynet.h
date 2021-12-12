@@ -36,4 +36,6 @@ void mynet_close(mqtt_connection *connection);
 void mynet_read(mqtt_connection *connection, void *buf, size_t size);
 void mynet_write(mqtt_connection *connection, void *buf, size_t size);
 
+void mynet_close(mqtt_connection *connection);
+
 #endif

@@ -3,6 +3,19 @@
 #include "string.h"
 #include "subcriber.h"
 
+void array_extract_token(char *topic, char **first, int *len)
+{
+    *len = 0;
+    char *p = strtok(topic, "/");
+    *first = p;
+
+    while (p != NULL)
+    {
+        *len++;
+        p = strtok(NULL, "/");
+    }
+}
+
 topic_node *topic_node_new()
 {
     topic_node *n = (topic_node *)malloc(sizeof(topic_node));
@@ -19,9 +32,9 @@ void topic_node_add_sub(topic_node *n, subcriber *s)
     // need to edit soon
 }
 
-topic_node* topic_init_node(topic_node *node)
+topic_node *topic_init_node(topic_node *node)
 {
-    topic_node * newNode = (topic_node*)malloc( sizeof(topic_node));
+    topic_node *newNode = (topic_node *)malloc(sizeof(topic_node));
     memset(newNode, 0, sizeof(topic_node));
     return newNode;
 }
@@ -38,33 +51,18 @@ topic_tree *topic_new_tree()
     return tree;
 }
 
-void topic_extract_token(char *topic, int len, char *first_topic)
-{
-    char *token;
-    const char s[2] = "/";
-    token = strtok(topic, s);
-    ///first_topic = token;
-    len = 0;
-    while (token != NULL)
-    {
-        len++;
-        //printf(" %s\n", token);
-        token = strtok(NULL, s);
-    }
-}
-
 void topic_add_sub(topic_tree *tree, subcriber *subcriber)
 {
     char *first_topic = NULL;
     int len = 0;
     char *topic = subcriber_get_topic(subcriber);
-    topic_extract_token(topic, len, first_topic);
+    array_extract_token(topic, &first_topic, &len);
 
     topic_node *cur_topic = tree->root; ///////////////// need to check
     while (len > 0)
     {
         len--;
-       // cur_topic = cur_topic + strlen(cur_topic) + 1;
+        // cur_topic = cur_topic + strlen(cur_topic) + 1;
         topic_node_add_sub(cur_topic, subcriber);
     }
     free(first_topic);
@@ -76,23 +74,75 @@ void topic_rmv_sub(topic_tree *tree, subcriber *subcriber)
     char *first_topic = NULL;
     int len = 0;
     char *topic = subcriber_get_topic(subcriber);
-    topic_extract_token(topic, len, first_topic);
+    array_extract_token(topic, &first_topic, &len);
 
     subcriber->node = NULL;
 }
 
-char *topic_node_find_sub(topic_node *node, char *first_topic, int len)
+char *topic_node_find_sub(topic_node *node, char *first_topic_field, int len)
 {
-    printf("thisnotthing");
-    return first_topic;
+    printf("topic_node_find_sub\n");
 }
+
+// char *topic_node_find_sub(topic_node *node)
+// {
+//     subcriber* subs = node->sub_list;
+//     int subs_len = sizeof(subs)/sizeof(subcriber);
+//     char* head = NULL;
+//     char* clientID_list = head;
+//     for(int i=0; i < len; i++){
+//         head
+//     }
+
+// }
 
 char *topic_tree_find_sub(topic_tree *tree, char *topic)
 {
-    char *first_topic = NULL;
+    char *first_topic_field = NULL;
     int len = 0;
-    topic_extract_token(topic, len, first_topic);
+    array_extract_token(topic, &first_topic_field, &len);
 
-    char *s = topic_node_find_sub(tree->root, first_topic, len);
-    return s;
+    char *subcribers = topic_node_find_sub(tree->root, first_topic_field, len);
+    free(first_topic_field);
+    return subcribers;
+}
+
+topic* topic_find_sub(topic *head, char *topic_name)
+{
+    if (head == NULL)
+    {
+        printf("+info: List topic is null\n");
+        return NULL;
+    }
+    else
+    {
+        struct topic *current = head; // Initialize current
+        while (current != NULL)
+        {
+            if (strcmp(current->name, topic_name) == 0)
+            {
+                printf("+info: had found client_list\n");
+                return current;
+            }
+            current = current->next;
+        }
+        //if had not found any client for this topic_name, create new topic with list of subcriber is null
+
+        return NULL;
+    }
+}
+
+int topic_get_clients_length(topic *t)
+{
+    int count = 0;
+    for (int i = 0; i < MAX_SUBCRIBER_LEN; i++)
+    {
+        if (t->clients[i] == NULL)
+        {
+            break;
+        }
+        else
+            count++;
+    }
+    return count;
 }

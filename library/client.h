@@ -9,11 +9,11 @@
 #include "broker.h"
 #include "subcriber.h"
 
-struct client {
+struct  client {
     char id[5];
     broker* broker;
     mqtt_connection* connection;
-    subcriber* subcribers;
+    // subcriber* subcribers;
     message* income;
     message* outcome;
 }; 

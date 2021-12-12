@@ -9,12 +9,14 @@
 #include <stdbool.h>
 #include "subcriber.h"
 
+#define MAX_TOPIC_LIST_LENGTH 100
 // model
 struct broker
 {
     mqtt_connection *listener;
     pthread_mutex_t mutex;
-    topic_tree *topics;
+    topic_tree *topic_tree;
+    topic* topic_head;
     client *clientList;
     bool isActive;
 };
@@ -24,9 +26,11 @@ void doCloseBroker(broker *broker, uint8_t lock);
 broker *initBroker(char *host, uint16_t port);
 void rmvBroker(broker *b);
 client *doBrokerAccept(broker *b);
-void doBrokerSendMessage(client *cliSender, subcriber *subcriber, message *mes);
-void doBrokerAddSubcriber(broker *b, subcriber *s);
+// void doBrokerPulishMessage(client *cliSrc, client* cliRcvList, message *mes);
+void doBrokerPulishMessage(client *cliSrc, topic* t, char* data);
+void doBrokerAddSubcriber(broker* b, char* topic_name, client* client);
 void doBrokerRmvSubcriber(broker *b, subcriber *sub);
-char *doBrokerFindSubcriber(broker *b, char *topic);
+client *doBrokerFindSubcriber(broker *b, char *topic);
+topic *doBrokerFindTopicNode(broker *b, char *topic);
 
 #endif // _BROKER_H_
