@@ -31,9 +31,9 @@ typedef enum
 
 typedef enum
 {
-    FLAG_CON = 0x01,
-    FLAG_PUB = 0x02,
-    FLAG_SUB = 0x03,
+    FLAG_CON = 1,
+    FLAG_PUB,
+    FLAG_SUB,
     FLAG_SUBACK,
     flag_UNSUB,
     FLAG_UNSUBACK,
@@ -59,20 +59,19 @@ struct message
     variable_header *variable_header;
 
     //payload
-    uint8_t* payload;
-
+    uint8_t *payload;
 };
 
 message *mes_new();
 const char *mes_type_tostring(mqtt_mes_type type);
-variable_header *variable_header_new(char* key, uint8_t *var_header_data, uint8_t var_header_size);
+variable_header *variable_header_new(char *key, uint8_t *var_header_data, uint8_t var_header_size);
 void mes_free(message *mes);
 
 // set and get
 variable_header *mes_get_var_header_data(message *mes);
 void mes_set_message_type(message *mes, uint8_t mes_type);
 void mes_set_flag(message *mes, uint8_t flag);
-void mes_set_variable_header(message *mes, char* key, uint8_t *var_header_data, uint8_t var_header_size);
+void mes_set_variable_header(message *mes, char *key, uint8_t *var_header_data, uint8_t var_header_size);
 
 void mes_set_payload(message *mes, uint8_t *payload, uint8_t payload_size);
 

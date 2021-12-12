@@ -14,7 +14,7 @@
 #include "mynet.h"
 // #include "client.h"
 
-#define DEFAULT_PORT 4444
+#define DEFAULT_PORT 4445
 #define DEFAULT_ADDR "127.0.0.1"
 
 broker *mybroker = NULL;

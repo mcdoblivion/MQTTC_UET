@@ -15,7 +15,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#define DEFAULT_PORT 4444
+#define DEFAULT_PORT 4445
 #define DEFAULT_ADDR "127.0.0.1"
 
 int pexit(const char *str)
@@ -36,9 +36,8 @@ mqtt_connection *clientDoConnect()
 
     char *greeting = "i am client";
     mes_CON(mes, (uint8_t *)greeting, strlen(greeting));
-    printf("mes type %s\n", mes->mes_type);
     //send CON
-    // mes_send(con, mes);
+    mes_send(con, mes);
 
     //receive CONACK
     // mes_recv(con, mes);

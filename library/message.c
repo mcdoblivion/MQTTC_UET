@@ -109,26 +109,20 @@ void mes_set_payload(message *mes, uint8_t *payload, uint8_t payload_size)
     {
         mes->payload = (uint8_t *)malloc(sizeof(uint8_t) * payload_size);
         memcpy(mes->payload, payload, payload_size);
+
     }
 }
 
 void mes_CON(message *mes, uint8_t *payload_data, uint8_t payload_size)
 {
-        printf("check0\n");
-
     mes_empty(mes);
-        printf("check1\n");
-
     mes_set_flag(mes, FLAG_CON);
     mes_set_message_type(mes, CON);
     mes->payload_size = payload_size;
     mes->variable_size = 0;
-        printf("check2\n");
-
     // lack of set var header ????
     // mes_set_variable_header(mes, NULL, NULL, NULL );
     mes_set_payload(mes, payload_data, payload_size);
-        printf("check3\n");
 }
 
 void mes_PUB(message *mes, char *topic, uint8_t flag, uint8_t *payload, uint8_t size)
