@@ -9,21 +9,21 @@
 #include "mynet.h"
 #include "message.h"
 
-static const char *mes_type_text[] = {
+static const char *MESSAGE_TYPE_TEXT[] = {
     "CON",
-    "CONACK",
+    "CON_ACK",
     "PUB",
-    "PUBACK",
+    "PUB_ACK",
     "SUB",
-    "SUBACK",
-    "UNSUB",
-    "UNSUBACK",
+    "SUB_ACK",
+    "UN_SUB",
+    "UN_SUB_ACK",
     "DISCON"
 };
 
-const char *mes_type_tostring(mqtt_mes_type type)
+const char *MESSAGE_TYPE_TO_STRING(MQTT_MESSAGE_TYPE type)
 {
-    return mes_type_text[(int)type];
+    return MESSAGE_TYPE_TEXT[(int)type];
 }
 
 variable_header *variable_header_new(char* key, uint8_t *var_header_data, uint8_t var_header_size)
@@ -36,21 +36,23 @@ variable_header *variable_header_new(char* key, uint8_t *var_header_data, uint8_
 
 message *mes_new()
 {
-   message *newMes = (message *)malloc(sizeof(struct message));
-//    newMes->variable_header = (variable_header*)malloc(sizeof(variable_header));
-   if (!newMes)
+    message *new_message = (message *)malloc(sizeof(struct message));
+    // new_message->variable_header = (variable_header *)malloc(sizeof(variable_header));
+    if (!new_message)
     {
         printf("fail when init message\n");
         return NULL;
     }
 
-    memset(newMes, 0, sizeof(message));
+    memset(new_message, 0, sizeof(message));
 
-    return newMes;
+    return new_message;
 }
 
-void mes_empty(message* mes){
-    if(mes->payload){
+void mes_empty(message *mes)
+{
+    if (mes->payload)
+    {
         free(mes->payload);
         printf("error mynet_read");
     }
@@ -58,14 +60,14 @@ void mes_empty(message* mes){
     mes->payload = NULL;
     mes->payload_size = 0;
 
-    if(mes->variable_header){
-    free(mes->variable_header->data);
-    free(mes->variable_header->key);
-    free(mes->variable_header);
-
+    if (mes->variable_header)
+    {
+        free(mes->variable_header->data);
+        free(mes->variable_header->key);
+        free(mes->variable_header);
     }
-
 }
+
 void mes_free(message *mes)
 {
     free(mes); // ?
@@ -89,14 +91,13 @@ void mes_set_flag(message *mes, uint8_t flag)
     mes->flag = flag;
 }
 
-
-void mes_set_variable_header(message *mes, char* key, uint8_t *var_header_data, uint8_t var_header_size)
+void mes_set_variable_header(message *mes, char *key, uint8_t *var_header_data, uint8_t var_header_size)
 {
     variable_header *vh = NULL;
 
     vh = variable_header_new(key, var_header_data, var_header_size);
     mes->variable_header = vh;
-    mes->variable_size = strlen((char*)vh->data);
+    mes->variable_size = strlen((char *)vh->data);
 }
 
 void mes_set_payload(message *mes, uint8_t *payload, uint8_t payload_size)
@@ -109,7 +110,6 @@ void mes_set_payload(message *mes, uint8_t *payload, uint8_t payload_size)
     {
         mes->payload = (uint8_t *)malloc(sizeof(uint8_t) * payload_size);
         memcpy(mes->payload, payload, payload_size);
-
     }
 }
 
@@ -130,7 +130,7 @@ void mes_PUB(message *mes, char *topic, uint8_t flag, uint8_t *payload, uint8_t 
     // on message publish, payload is content of message which will be published to topic
     mes_set_flag(mes, flag);
     mes_set_message_type(mes, PUB);
-   // mes_set_variable_header(mes, NULL, NULL, NULL);
+    // mes_set_variable_header(mes, NULL, NULL, NULL);
     // mes_set_variable_header(mes, "q-topic", topic);
 
     mes_set_payload(mes, payload, size);
@@ -144,27 +144,25 @@ void mes_SUB(message *mes, uint8_t flag, char *mes_id, char *topic)
     if (topic)
     {
         // mes_set_variable_header(mes, "mes-id", mes_id);
-     //   mes_set_variable_header(mes, NULL, NULL, NULL);
+        //   mes_set_variable_header(mes, NULL, NULL, NULL);
         uint8_t payload_size = strlen(topic);
         // mes_set_payload(mes, topic, payload_size);
         mes_set_payload(mes, NULL, payload_size);
-
     }
 }
 
-void mes_UNSUB(message *mes, uint8_t flag, char *mes_id, char *topic)
+void mes_UN_SUB(message *mes, uint8_t flag, char *mes_id, char *topic)
 {
     mes_set_flag(mes, flag);
-    mes_set_message_type(mes, UNSUB);
+    mes_set_message_type(mes, UN_SUB);
     if (topic)
     {
         // mes_set_variable_header(mes, "mes-id", mes_id);
-     //   mes_set_variable_header(mes, NULL, NULL, NULL);
+        //   mes_set_variable_header(mes, NULL, NULL, NULL);
 
         uint8_t payload_size = strlen(topic);
         // mes_set_payload(mes, topic, payload_size);
         mes_set_payload(mes, NULL, payload_size);
-
     }
 }
 
@@ -172,7 +170,7 @@ void mes_ACK(message *dst, message *src, char *msg)
 {
     mes_set_message_type(dst, src->mes_type);
     mes_set_flag(dst, src->flag);
-  //  mes_set_variable_header(dst, NULL, NULL, NULL);
+    //  mes_set_variable_header(dst, NULL, NULL, NULL);
     mes_set_message_type(dst, ACK);
 
     if (!strlen(msg))
@@ -180,8 +178,7 @@ void mes_ACK(message *dst, message *src, char *msg)
         msg = "BROKER received msg";
         mes_set_payload(dst, (uint8_t *)msg, strlen(msg));
         // mes_set_variable_header(dst, "mes-ack", "200 OK");
-       // mes_set_variable_header(dst, NULL, NULL, NULL);
-
+        // mes_set_variable_header(dst, NULL, NULL, NULL);
     }
 }
 
@@ -224,25 +221,24 @@ void mes_recv(mqtt_connection *con, message *mes)
     // uint8_t mes_type;
     // uint8_t flag;
     // uint8_t payload_size;
-  
+
     // memcpy(&mes_type, fixed_header + OFFSET_MESSAGE_TYPE, sizeof(mes_type));
     // memcpy(&flag, fixed_header + OFFSET_FLAG, sizeof(flag));
     // memcpy(&vars_size, fixed_header + OFFSET_REMAIN_VAR_SIZE, sizeof(vars_size));
     // memcpy(&payload_size, fixed_header + OFFSET_REMAIN_PAYLOAD_SIZE, sizeof(payload_size));
-    
-//     // set fix header
-//     mes_set_flag(mes, flag);
-//     mes_set_message_type(mes, mes_type);
-//     mes->variable_size = vars_size;
-//     mes->payload_size = payload_size;
 
-//     // set variable_header_data
-//     uint8_t* variable_header_data = (uint8_t*)malloc(sizeof(uint8_t) * vars_size);
-//     mynet_read(con, variable_header_data, vars_size);
-//     mes_set_variable_header(mes, "mes_recv" , variable_header_data);
-// //   set payload_data
-//     uint8_t* payload_data = (uint8_t*)malloc(sizeof(uint8_t) * payload_size);
-//     mynet_read(con, payload_data, payload_size);
-//     mes_set_payload(mes, payload_data, payload_size);
+    //     // set fix header
+    //     mes_set_flag(mes, flag);
+    //     mes_set_message_type(mes, mes_type);
+    //     mes->variable_size = vars_size;
+    //     mes->payload_size = payload_size;
 
+    //     // set variable_header_data
+    //     uint8_t* variable_header_data = (uint8_t*)malloc(sizeof(uint8_t) * vars_size);
+    //     mynet_read(con, variable_header_data, vars_size);
+    //     mes_set_variable_header(mes, "mes_recv" , variable_header_data);
+    // //   set payload_data
+    //     uint8_t* payload_data = (uint8_t*)malloc(sizeof(uint8_t) * payload_size);
+    //     mynet_read(con, payload_data, payload_size);
+    //     mes_set_payload(mes, payload_data, payload_size);
 }

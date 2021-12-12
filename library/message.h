@@ -22,24 +22,24 @@ typedef enum
     CON = 1,
     PUB,
     SUB,
-    SUBACK,
-    UNSUB,
-    UNSUBACK,
+    SUB_ACK,
+    UN_SUB,
+    UN_SUB_ACK,
     ACK,
     DISCON
-} mqtt_mes_type;
+} MQTT_MESSAGE_TYPE;
 
 typedef enum
 {
     FLAG_CON = 1,
     FLAG_PUB,
     FLAG_SUB,
-    FLAG_SUBACK,
-    flag_UNSUB,
-    FLAG_UNSUBACK,
+    FLAG_SUB_ACK,
+    flag_UN_SUB,
+    FLAG_UN_SUB_ACK,
     FLAG_ACK,
 
-} mqtt_flag;
+} MQTT_FLAG;
 
 struct variable_header
 {
@@ -63,7 +63,7 @@ struct message
 };
 
 message *mes_new();
-const char *mes_type_tostring(mqtt_mes_type type);
+const char *MESSAGE_TYPE_TO_STRING(MQTT_MESSAGE_TYPE type);
 variable_header *variable_header_new(char *key, uint8_t *var_header_data, uint8_t var_header_size);
 void mes_free(message *mes);
 
@@ -79,7 +79,7 @@ void mes_set_payload(message *mes, uint8_t *payload, uint8_t payload_size);
 void mes_CON(message *mes, uint8_t *info, uint8_t payload_size);
 void mes_PUB(message *mes, char *topic, uint8_t flag, uint8_t *payload, uint8_t size);
 void mes_SUB(message *mes, uint8_t flag, char *mes_id, char *topic);
-void mes_UNSUB(message *mes, uint8_t flag, char *mes_id, char *topic);
+void mes_UN_SUB(message *mes, uint8_t flag, char *mes_id, char *topic);
 void mes_ACK(message *dst, message *src, char *msg);
 
 //action with mes

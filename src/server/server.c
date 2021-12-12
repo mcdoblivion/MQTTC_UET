@@ -89,7 +89,7 @@ void *todoHandleClient(void *arg)
         case SUB:
             serverHandleSubscriber(cli);
             break;
-        case UNSUB:
+        case UN_SUB:
             handleUnsubscribe(cli);
             break;
         default:
