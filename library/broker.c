@@ -28,15 +28,16 @@ broker *initBroker(char *host, uint16_t port)
     else
         memset(b, 0, sizeof(*b));
 
-    //init mutex
+    // //init mutex
     pthread_mutex_init(&b->mutex, NULL);
     //init topics of broker
     topic_tree *topics = topic_new_tree();
     b->topics = topics;
-    //init listener
+    // //init listener
     mqtt_connection *listener = mynet_listen(host, port);
     b->listener = listener;
     b->isActive = true;
+
     return b;
 }
 

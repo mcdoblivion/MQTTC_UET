@@ -8,9 +8,9 @@ char* subcriber_init_id(char* topic, client* client){
     size_t client_id_len = strlen(client->id);
     char* id = malloc(sizeof(char)* (topic_name_len + client_id_len + 2 ));
     memmove(id, client->id, client_id_len);
-    *(id + client_id_len) = "-";
+    // *(id + client_id_len) = "-";
     memmove(id + client_id_len + 1, topic, topic_name_len);
-    *(id + client_id_len +  topic_name_len + 1) = '\0';
+    // *(id + client_id_len +  topic_name_len + 1) = '\0';
 
     return id;
 }

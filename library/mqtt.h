@@ -12,4 +12,4 @@ typedef struct topic_node topic_node;
 typedef struct topic_tree topic_tree;
 typedef struct broker broker;
 
-#endif  //
+#endif

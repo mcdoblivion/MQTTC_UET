@@ -9,8 +9,6 @@
 #include "broker.h"
 #include "subcriber.h"
 
-// typedef struct client client;
-
 struct client {
     char id[5];
     broker* broker;
@@ -18,7 +16,6 @@ struct client {
     subcriber* subcribers;
     message* income;
     message* outcome;
-
 }; 
 
 client* client_new(mqtt_connection* connection, broker* broker);

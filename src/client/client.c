@@ -96,8 +96,9 @@ void clientDoSub()
 int main(int agrc, char *argv[])
 {
     char cmd[50] = "pub";
+    
     printf("input your command: ");
-    //gets(cmd);
+    gets(cmd);
 
     int todo = 0;
     if (strcmp(cmd, "pub"))

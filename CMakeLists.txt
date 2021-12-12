@@ -14,8 +14,8 @@ add_subdirectory(library)
 file(GLOB SERVER_SRC "src/server/*.c")
 file(GLOB CLIENT_SRC "src/client/*.c")
 
-add_executable(server ${SERVER_SRC})
-target_link_libraries(server library)
-
 add_executable(client ${CLIENT_SRC})
 target_link_libraries(client library)
+
+add_executable(server ${SERVER_SRC})
+target_link_libraries(server library)

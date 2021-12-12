@@ -14,7 +14,7 @@ mqtt_connection *conn_init(const char *host, uint16_t port, mqtt_status status)
 
     if (addr != NULL)
     {
-        memset(addr, 0, sizeof(addr));
+        // memset(addr, 0, sizeof(addr));
         addr->sin_family = AF_INET;
         addr->sin_addr.s_addr = inet_addr(host);
         addr->sin_port = htons(port);
@@ -84,7 +84,8 @@ mqtt_connection *mynet_listen(const char *host, uint16_t port)
         conn_free(connection);
         return NULL;
     }
-    if(bind(connection->sockfd,(struct sockaddr*)connection->sockfd, sizeof(*(connection->addr))) < 0) {
+
+    if(bind(connection->sockfd,(struct sockaddr*)connection->addr, sizeof(*(connection->addr))) < 0) {
         perror("bind");
         conn_free(connection);
         return NULL;

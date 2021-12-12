@@ -19,9 +19,11 @@ void topic_node_add_sub(topic_node *n, subcriber *s)
     // need to edit soon
 }
 
-void topic_init_node(topic_node *node)
+topic_node* topic_init_node(topic_node *node)
 {
-    memset(node, 0, sizeof(*node));
+    topic_node * newNode = (topic_node*)malloc( sizeof(topic_node));
+    memset(newNode, 0, sizeof(topic_node));
+    return newNode;
 }
 void topic_init_tree(topic_tree *tree)
 {

@@ -9,8 +9,10 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "mqtt.h"
-#include "client.h"
 #include "broker.h"
+#include "message.h"
+#include "mynet.h"
+// #include "client.h"
 
 #define DEFAULT_PORT 4444
 #define DEFAULT_ADDR "127.0.0.1"
@@ -19,8 +21,10 @@ broker *mybroker = NULL;
 
 void serverDoSentAck(client *cli, message *mesIn, char *msg)
 {
-    mes_ACK(cli->outcome, mesIn, msg);
-    client_send(cli, cli->outcome);
+    // message *mesOut = NULL;
+    // message *mesOut = cli->outcome;
+    // mes_ACK(mesOut, mesIn, msg);
+    // client_send(cli, mesOut);
 }
 
 void serverHandleCON(client *cli)
@@ -33,7 +37,7 @@ void serverHandlePUB(client *cli)
 {
     printf("serverHandleCON");
 
-   // message *in = cli->income;
+    // message *in = cli->income;
 
     //find topic from mes income
     // broker find subs have topic above
@@ -55,14 +59,14 @@ void handleUNSUB(client *cli)
 {
     //
     printf("serverHandleCON");
-
 }
 
-void* todoHandleClient(void *arg)
+void *todoHandleClient(void *arg)
 {
     client *cli = (client *)arg;
     broker *mybroker = cli->broker;
-    while (true)
+    printf("sdff"); //no
+    while (1)
     {
         //client_read(cli); // read a client
         mes_recv(cli->connection, cli->income);
@@ -93,8 +97,8 @@ int main(int argc, char *argv[])
     mybroker = initBroker(DEFAULT_ADDR, DEFAULT_PORT);
     client *myclient = NULL;
     pthread_t tid;
-    
-    while (true)
+
+    while (1)
     {
         myclient = doBrokerAccept(mybroker);
         pthread_create(&tid, NULL, &todoHandleClient, (void *)myclient);
