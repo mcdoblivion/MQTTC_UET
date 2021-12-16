@@ -16,6 +16,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
 #include "mqtt.h"
 #include "broker.h"
 #include "message.h"
@@ -30,7 +31,7 @@ void serverDoSendAck(client *cli, message *mesIn, char *msg)
 {
     message *mesOut = cli->outcome;
     mes_ACK(mesOut, mesIn, msg);
-    client_send(cli, mesOut);
+    mes_send(cli->connection, mesOut);
 }
 
 void serverHandleConnection(client *cli)
@@ -154,7 +155,7 @@ void *todoHandleClient(void *arg)
             break;
 
         default:
-            printf("error when read message type from client\n");
+            printf("+error when read message type from client\n");
             break;
         }
     }
