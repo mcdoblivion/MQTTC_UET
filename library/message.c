@@ -9,22 +9,6 @@
 #include "mynet.h"
 #include "message.h"
 
-//reduntant code
-static const char *MESSAGE_TYPE_TEXT[] = {
-    "CON",
-    "CON_ACK",
-    "PUB",
-    "PUB_ACK",
-    "SUB",
-    "SUB_ACK",
-    "UN_SUB",
-    "UN_SUB_ACK",
-    "DISCON"};
-//reduntant code
-const char *MESSAGE_TYPE_TO_STRING(MQTT_MESSAGE_TYPE type)
-{
-    return MESSAGE_TYPE_TEXT[(int)type];
-}
 
 message *mes_new()
 {
@@ -154,7 +138,6 @@ void mes_COPY(message *dst, message *src)
     dst->flag = src->flag;
     dst->mes_type = src->mes_type;
     dst->variable_size = src->variable_size;
-
     mes_set_variable_hdr(dst, src->variable_header, src->variable_size);
     mes_set_payload(dst, src->payload, src->payload_size);
 }
@@ -164,10 +147,9 @@ void mes_ACK(message *dst, message *src, char *msg)
     mes_COPY(dst, src);
     mes_set_flag(dst, src->flag);
     mes_set_message_type(dst, ACK);
-
     if (!strlen(msg))
     {
-        msg = "THIS IS ACK FROM BROKER";
+        msg = "THIS IS ACK FROM BROKER\n";
     }
     dst->payload_size = strlen(msg);
     mes_set_payload(dst, (uint8_t *)msg, strlen(msg));
@@ -209,7 +191,7 @@ void mes_send(mqtt_connection *con, message *mes)
 
 void mes_recv(mqtt_connection *con, message *mes)
 {
-    // make empty mes
+    // create fixed_header_buf
     uint8_t fixed_header[FIXED_HEADER_SIZE];
     mynet_read(con, fixed_header, FIXED_HEADER_SIZE);
 

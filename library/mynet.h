@@ -16,26 +16,23 @@ typedef enum
     LISTEN,
     CONNECTING,
     CONNECTED,
-    RECONNECTING,
     DISCONNECTED,
     CLOSE,
-} mqtt_status;
+} network_status;
 
 struct connection
 {
     int sockfd;
     struct sockaddr_in *addr;
-    mqtt_status status;
+    network_status status;
 };
 
 mqtt_connection *mynet_listen(const char *host, uint16_t port);
 mqtt_connection *mynet_connect(const char *host, uint16_t port);
 mqtt_connection *mynet_accept(mqtt_connection *listenter);
 void mynet_close(mqtt_connection *connection);
-
 void mynet_read(mqtt_connection *connection, void *buf, size_t size);
 void mynet_write(mqtt_connection *connection, void *buf, size_t size);
-
 void mynet_close(mqtt_connection *connection);
 
 #endif

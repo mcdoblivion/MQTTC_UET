@@ -13,7 +13,6 @@ struct  client {
     char id[5];
     broker* broker;
     mqtt_connection* connection;
-    // subcriber* subcribers;
     message* income;
     message* outcome;
 }; 

@@ -39,6 +39,7 @@ void catch_ctrl_c_and_exit(int sig)
 mqtt_connection *clientDoConnect()
 {
     mqtt_connection *con = mynet_connect(DEFAULT_ADDR, DEFAULT_PORT);
+
     if (!con)
         exit(1);
 
@@ -105,6 +106,7 @@ void clientDoPublish(mqtt_connection *con)
     {
         printf(">>Published to broker fail\n");
     }
+
     mes_free(outMes);
     mes_free(inMes);
 }
@@ -119,7 +121,7 @@ void clientDoSubscribe(mqtt_connection *con)
     char *payload = "home/light";
     mes_SUB(outMes, flag_UN_SUB, (uint8_t *)payload, strlen(payload));
 
-    //SEND
+    //send SUB
     mes_send(con, outMes);
     //recv ack
     mes_recv(con, inMes);
@@ -127,16 +129,7 @@ void clientDoSubscribe(mqtt_connection *con)
     if (strcmp(inMes->payload, "SUBCRIBER OK") == 0)
     {
         printf(">>Successfully Subcribbed topic: \"%s\"\n", outMes->payload);
-        // while (1)
-        // {
-        //     /* code */
-        //     printf("listening........\n");
-        //     message *listenMes = mes_new();
-        //     mes_recv(con, listenMes);
-        //     printf("RECEIVED DATA: \"%s\"\n", listenMes->payload);
-        // }
     }
-
     else
     {
         printf(">>SUBCRIBER to broker fail\n");
@@ -179,84 +172,9 @@ void send_msg_handler(void *arg)
     mqtt_connection *myConnection = (mqtt_connection *)arg;
     char cmd[50];
     int todo = 0;
-    char message[2048] = {};
-    // while (1)
-    // {
-    //     printf("Enter your command with broker: ");
-    //     gets(cmd);
-    //     if (strcmp(cmd, "PUB") == 0)
-    //         todo = 1; // Publisher
-    //     else if (strcmp(cmd, "SUB") == 0)
-    //         todo = 2; // Subscriber
-    //     else if (strcmp(cmd, "UNSUB") == 0)
-    //         todo = 3;
-    //     else if (strcmp(cmd, "DISCON") == 0)
-    //         todo = 4;
-
-    //     switch (todo)
-    //     {
-    //     case 1:
-    //         clientDoPublish(myConnection);
-    //         break;
-    //     case 2:
-    //         clientDoSubscribe(myConnection);
-    //         break;
-    //     case 3:
-    //         clientDoUnsubcribe(myConnection);
-    //         break;
-    //     case 4:
-    //         clientDoDisconnect(myConnection);
-    //         break;
-    //     default:
-    //         printf("Wrong command!\n");
-    //         break;
-    //     }
-    // }
-    // catch_ctrl_c_and_exit(2);
-}
-
-void recv_msg_handler(void *arg)
-{
-    mqtt_connection *con = (mqtt_connection *)arg;
     while (1)
     {
-        message *listenMes = mes_new();
-        mes_recv(con, listenMes);
-        printf("=>>New data received: \'%s\', from topic: \'%s\'\n", listenMes->payload, listenMes->variable_header);
-        mes_free(listenMes);
-    }
-}
-int main(int agrc, char *argv[])
-{
-    mqtt_connection *myConnection = NULL;
-    char cmd[50];
-    int todo = 0;
-    signal(SIGINT, catch_ctrl_c_and_exit);
-
-    while (1)
-    {
-        printf("Enter your command: ");
-        gets(cmd);
-        if (strcmp(cmd, "CON") == 0)
-        {
-            myConnection = clientDoConnect();
-            if (myConnection->status != CONNECTED)
-            {
-                printf("fail to connect, try again\n");
-            }
-            else
-            {
-                break;
-            }
-        }
-        else
-        {
-            printf("wrong command, pls try\n");
-        }
-    }
-    while (1)
-    {
-        printf("Enter your command with broker: ");
+        printf("Client# ");
         gets(cmd);
         if (strcmp(cmd, "PUB") == 0)
             todo = 1; // Publisher
@@ -287,13 +205,66 @@ int main(int agrc, char *argv[])
         }
         todo = 0;
     }
+    catch_ctrl_c_and_exit(2);
+}
 
-    // pthread_t send_msg_thread;
-    // if (pthread_create(&send_msg_thread, NULL, (void *)send_msg_handler, myConnection) != 0)
+void recv_msg_handler(void *arg)
+{
+    mqtt_connection *con = (mqtt_connection *)arg;
+    while (1)
+    {
+        message *listenMes = mes_new();
+        mes_recv(con, listenMes);
+        if (con->status == DISCONNECTED)
+            break;
+        
+        printf("\n=>>New data received: \'%s\', from topic: \'%s\'\nClient# ", listenMes->payload, listenMes->variable_header);
+        mes_free(listenMes);
+    }
+    catch_ctrl_c_and_exit(2);
+}
+int main(int argc, char *argv[])
+{
+    // if (argc != 2)
     // {
-    //     printf("ERROR: pthread\n");
-    //     exit(1);
+    //     printf("Usage: %s <port>\n", argv[0]);
     // }
+    // int port = atoi(argv[1]);
+
+    mqtt_connection *myConnection = NULL;
+    char cmd[50];
+    int todo = 0;
+    signal(SIGINT, catch_ctrl_c_and_exit);
+
+    while (1)
+    {
+        printf("Client> ");
+        gets(cmd);
+        if (strcmp(cmd, "CON") == 0)
+        {
+            myConnection = clientDoConnect();
+            if (myConnection->status != CONNECTED)
+            {
+                printf("fail to connect, try again\n");
+            }
+            else
+            {
+                break;
+            }
+        }
+        else
+        {
+            printf("wrong command, pls try\n");
+        }
+    }
+
+    // thread for send message from broker
+    pthread_t send_msg_thread;
+    if (pthread_create(&send_msg_thread, NULL, (void *)send_msg_handler, myConnection) != 0)
+    {
+        printf("ERROR: pthread\n");
+        return EXIT_FAILURE;
+    }
 
     // thread for receive message from broker
     pthread_t recv_msg_thread;
@@ -312,5 +283,5 @@ int main(int agrc, char *argv[])
     }
     clientDoDisconnect(myConnection);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
