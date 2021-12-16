@@ -21,7 +21,7 @@
 #include "message.h"
 #include "mynet.h"
 
-#define DEFAULT_PORT 4448
+#define DEFAULT_PORT 4449
 #define DEFAULT_ADDR "127.0.0.1"
 
 broker *my_broker = NULL;
@@ -35,32 +35,34 @@ void serverDoSendAck(client *cli, message *mesIn, char *msg)
 
 void serverHandleConnection(client *cli)
 {
-    printf("serverHandleConnection\n");
     char *msg = "200 HELLO CLIENT";
     serverDoSendAck(cli, cli->income, msg);
 }
 
 void serverHandlePublisher(client *cli)
 {
-    printf("serverHandlePublisher\n");
+    printf("+status: handling publisher...\n");
     message *client_PUB_message = cli->income;
 
     //find topic from mes income
     char *topic_name = client_PUB_message->variable_header;
     char *data = client_PUB_message->payload;
-    printf("client_PUB_message->topic: %s\n", topic_name);
-    printf("client_PUB_message->data: %s\n", data);
-    if(topic_name && data){
+    printf("ClientID \'%s\'->topic: %s\n", cli->id, topic_name);
+    printf("ClientID \'%s\'->message: %s\n", cli->id, data);
+    if (topic_name && data)
+    {
         char *msg = "PUBLISH OK";
         serverDoSendAck(cli, cli->income, msg);
     }
 
     //broker find topic have name is topic_name above
-    topic* t = doBrokerFindTopicNode(cli->broker, topic_name);
-    int cliSubLen = topic_get_clients_length(t);
-    // create new mes to deliver: frame_MSG
-    //using loop to detemine which client is subcriber in "subs" of broker
-    // after that : doBrokerSendMessage(cli, sub, mes)
+    topic *t = doBrokerFindTopicNode(cli->broker, topic_name);
+    int cliSubLen = 0;
+    if (t != NULL)
+    {
+        cliSubLen = topic_get_clients_length(t);
+    }
+
     if (cliSubLen > 0)
     {
         printf("+info: publishing to each client in list\n");
@@ -70,39 +72,57 @@ void serverHandlePublisher(client *cli)
     {
         printf("+info: have no client for this topic.\n");
     }
-
 }
 
 void serverHandleSubscriber(client *cli)
 {
-    printf("serverHandleSubscriber\n");
+    printf("+status: handling subciber...\n");
     message *client_SUB_message = cli->income;
 
     //find topic from mes income
     char *topic = client_SUB_message->payload;
+    char *msg;
     if (topic != NULL)
     {
-        printf("subcribe to \"%s\" for client_id %s\n", topic, cli->id);
+        printf("+info: subcribing to \"%s\" for client_id %s\n", topic, cli->id);
         doBrokerAddSubcriber(cli->broker, topic, cli);
+        msg = "SUBCRIBER OK";
     }
     else
     {
-        printf("invalid topic, cannot handle subcribe\n");
+        printf("invalid topic, cannot handle Subcribe\n");
+        msg = "SUBCRIBER FAIL";
     }
 
-    char *msg = "SUBCRIBER OK";
     serverDoSendAck(cli, cli->income, msg);
 }
 
 void handleUnsubscribe(client *cli)
 {
+    printf("+status: handling unsubcribe...\n");
+    message *client_SUB_message = cli->income;
 
-    printf("handleUnsubscribe\n");
+    //find topic from mes income
+    char *topic = client_SUB_message->payload;
+    char *msg;
+    if (topic != NULL)
+    {
+        printf("+info: UnSubcribing topic \"%s\" for client_id \'%s\'\n", topic, cli->id);
+        doBrokerRmvSubcriber(cli->broker, topic, cli);
+        msg = "UNSUBCRIBER OK";
+    }
+    else
+    {
+        printf("invalid topic, cannot handle UNSubcribe\n");
+        msg = "UNSUBCRIBER FAIL";
+    }
+
+    serverDoSendAck(cli, cli->income, msg);
 }
 
 void serverHandleDISCON(client *cli)
 {
-    printf("serverHandleDISCON\n");
+    printf("+status: handling disconnect client...\n");
     mynet_close(cli->connection);
 }
 
@@ -112,9 +132,7 @@ void *todoHandleClient(void *arg)
     broker *my_broker = cli->broker;
     while (1)
     {
-        printf("--loop\n");
         mes_recv(cli->connection, cli->income);
-
         if (cli->income->mes_type == DISCON)
         {
             serverHandleDISCON(cli);

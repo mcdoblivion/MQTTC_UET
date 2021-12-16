@@ -144,7 +144,6 @@ mqtt_connection *mynet_accept(mqtt_connection *listener)
         }
     }
 
-    printf("Broker has been initialized with client %s\n", inet_ntoa(cliAddr->sin_addr));
 
     mqtt_connection *connection = (mqtt_connection *)malloc(sizeof(mqtt_connection));
     connection->sockfd = cliSock;
@@ -168,7 +167,7 @@ void mynet_read(mqtt_connection *connection, void *recvBuf, size_t size)
         int recvSize = read(connection->sockfd, recvBuf, size);
         if (recvSize < 0)
         {
-            printf("error mynet_read");
+            printf("error mynet_read\n");
         }
     }
 }

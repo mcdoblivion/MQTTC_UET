@@ -137,19 +137,15 @@ void mes_SUB(message *mes, uint8_t flag, uint8_t *payload, uint8_t payload_size)
     mes_set_payload(mes, payload, payload_size);
 }
 
-void mes_UN_SUB(message *mes, uint8_t flag, char *mes_id, char *topic)
+void mes_UNSUB(message *mes, uint8_t flag, uint8_t *payload, uint8_t payload_size)
 {
+    mes_empty(mes);
     mes_set_flag(mes, flag);
     mes_set_message_type(mes, UN_SUB);
-    if (topic)
-    {
-        // mes_set_variable_header(mes, "mes-id", mes_id);
-        //   mes_set_variable_header(mes, NULL, NULL, NULL);
-
-        uint8_t payload_size = strlen(topic);
-        // mes_set_payload(mes, topic, payload_size);
-        mes_set_payload(mes, NULL, payload_size);
-    }
+    mes->payload_size = payload_size;
+    mes->variable_size = 0;
+    mes_set_variable_hdr(mes, NULL, 0);
+    mes_set_payload(mes, payload, payload_size);
 }
 
 void mes_COPY(message *dst, message *src)
