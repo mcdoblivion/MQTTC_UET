@@ -4,7 +4,6 @@ project(MQTTC_UET VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 11)
 
 #COMPILER
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pthread")
 
 #BUILD LIB
