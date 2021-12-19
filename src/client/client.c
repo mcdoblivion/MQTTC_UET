@@ -23,7 +23,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#define DEFAULT_PORT 4449
+#define DEFAULT_PORT 4448
 #define DEFAULT_ADDR "127.0.0.1"
 #define LENGTH 2048
 volatile sig_atomic_t flag = 0;
@@ -48,7 +48,7 @@ mqtt_connection *clientDoConnect()
     if (!mes)
         exit(1);
 
-    char *greeting = "I am Client";
+    char *greeting = "HELLO BROKER";
     mes_CON(mes, (uint8_t *)greeting, strlen(greeting));
     //send CON
     mes_send(con, mes);
@@ -87,22 +87,30 @@ void clientDoPublish(mqtt_connection *con)
     message *inMes = mes_new();
     message *outMes = mes_new();
 
-    // // handle input topic for keyboard
-    // printf("input your topic and data: ");
-    // char input[50];
-    // gets(input);
+    // handle input topic for keyboard
+    printf("Switch mode to publisher, pls enter your topic and data!\n");
+    char topic[30];
 
-    char *topic = "home/light";
-    char *data = "it is lower energy";
+    char data[30];
+    printf("Enter topic: ");
+    scanf("%s", topic);
+    getchar();
+    printf("Enter data: ");
+    fflush(stdin);
+    // fgets(data, sizeof(data), stdin);
+    gets(data);
+    // char *topic = "home/light";
+    // char *data = "it is lower energy";
+
+    //create message PUB
     mes_PUB(outMes, topic, FLAG_PUB, data, strlen(data));
 
-    // //send PUB
+    //send PUB
     mes_send(con, outMes);
-    // //receive ack
+    //receive ack
     mes_recv(con, inMes);
-    // if(strcmp(inMes->variable_header, "PUBACK")==0 && strcmp(inMes->payload, "PUBLISH OK") == 0)
     if (strcmp(inMes->payload, "PUBLISH OK") == 0)
-        printf(">>Successfully published to broker \"%s\"\n", topic);
+        printf(">>Successfully published message= \"%s\", topic =\"%s\"\n", data, topic);
     else
     {
         printf(">>Published to broker fail\n");
@@ -117,10 +125,14 @@ void clientDoSubscribe(mqtt_connection *con)
     message *inMes = mes_new();
     message *outMes = mes_new();
 
-    // handle input topic for keyboard
-    // char *topic = "home/bulb";
-    char *payload = "home/light";
-    mes_SUB(outMes, flag_UN_SUB, (uint8_t *)payload, strlen(payload));
+     // handle input topic for keyboard
+    printf("Switch mode to subcriber, pls enter your topic need to subcribe!\n");
+    char topic[30];
+    printf("Enter topic: ");
+    scanf("%s", topic);
+    getchar();
+    // char *payload = "home/light";
+    mes_SUB(outMes, flag_UN_SUB, (uint8_t *)topic, strlen(topic));
 
     //send SUB
     mes_send(con, outMes);
@@ -146,9 +158,13 @@ void clientDoUnsubcribe(mqtt_connection *con)
     message *outMes = mes_new();
 
     // handle input topic for keyboard
-    // char *topic = "home/bulb";
-    char *payload = "home/light";
-    mes_UNSUB(outMes, FLAG_SUB, (uint8_t *)payload, strlen(payload));
+    printf("Switch mode to subcriber, pls enter your topic need to unsubcribe!\n");
+    char topic[30];
+    printf("Enter topic: ");
+    scanf("%s", topic);
+    getchar();
+    // char *payload = "home/light";
+    mes_UNSUB(outMes, FLAG_SUB, (uint8_t *)topic, strlen(topic));
 
     //SEND
     mes_send(con, outMes);
@@ -177,13 +193,13 @@ void send_msg_handler(void *arg)
     {
         printf("Client# ");
         gets(cmd);
-        if (strcmp(cmd, "PUB") == 0)
+        if (strcmp(cmd, "publish") == 0)
             todo = 1; // Publisher
-        else if (strcmp(cmd, "SUB") == 0)
+        else if (strcmp(cmd, "subcribe") == 0)
             todo = 2; // Subscriber
-        else if (strcmp(cmd, "UNSUB") == 0)
+        else if (strcmp(cmd, "unsubcribe") == 0)
             todo = 3;
-        else if (strcmp(cmd, "DISCON") == 0)
+        else if (strcmp(cmd, "disconnect") == 0)
             todo = 4;
 
         switch (todo)
@@ -218,20 +234,15 @@ void recv_msg_handler(void *arg)
         mes_recv(con, listenMes);
         if (con->status == DISCONNECTED)
             break;
-        
-        printf("\n=>>New data received: \'%s\', from topic: \'%s\'\nClient# ", listenMes->payload, listenMes->variable_header);
+
+        printf("\n=>>New message received: \'%s\', from topic: \'%s\'\nClient# ", listenMes->payload, listenMes->variable_header);
+        // getchar();
         mes_free(listenMes);
     }
     catch_ctrl_c_and_exit(2);
 }
 int main(int argc, char *argv[])
 {
-    // if (argc != 2)
-    // {
-    //     printf("Usage: %s <port>\n", argv[0]);
-    // }
-    // int port = atoi(argv[1]);
-
     mqtt_connection *myConnection = NULL;
     char cmd[50];
     int todo = 0;
@@ -241,7 +252,7 @@ int main(int argc, char *argv[])
     {
         printf("Client> ");
         gets(cmd);
-        if (strcmp(cmd, "CON") == 0)
+        if (strcmp(cmd, "connect") == 0)
         {
             myConnection = clientDoConnect();
             if (myConnection->status != CONNECTED)

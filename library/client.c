@@ -4,7 +4,6 @@
 #include "topic.h"
 #include "mynet.h"
 #include "broker.h"
-#include "subcriber.h"
 #include "client.h"
 
 
@@ -33,12 +32,4 @@ client* client_new(mqtt_connection* connection, broker* broker){
 
 void client_free(client* client){
     free(client);
-}
-
-void client_receive(client* client, message* mes){
-    mes_recv(client->connection, mes);
-}
-
-void client_send(client* client, message* mes){
-    mes_send(client->connection, mes);
 }

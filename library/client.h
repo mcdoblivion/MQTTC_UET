@@ -7,7 +7,6 @@
 #include "topic.h"
 #include "mynet.h"
 #include "broker.h"
-#include "subcriber.h"
 
 struct  client {
     char id[5];
@@ -17,9 +16,8 @@ struct  client {
     message* outcome;
 }; 
 
+//function
 client* client_new(mqtt_connection* connection, broker* broker);
-void client_send(client* client, message* mes);
-void client_receive(client* client, message* mes);
-
+void client_free(client* client);
 
 #endif

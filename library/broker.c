@@ -3,7 +3,6 @@
 #include "mynet.h"
 #include "pthread.h"
 #include "broker.h"
-#include "subcriber.h"
 #include "topic.h"
 
 void doCloseBroker(broker *broker, uint8_t lock)
@@ -73,7 +72,7 @@ void doBrokerPulishMessage(client *cliSrc, topic *t, char *data)
     for (int i = 0; i < cliSubLen; i++)
     {
         client *cliRecv = t->clients[i];
-        printf("->>sent to client_id: \'%s\', data:\'%s\'\n, topic: \'%s\'\n", cliRecv->id, data, t->name);
+        printf("->>Publishing to client_id: \'%s\', data:\'%s\', topic: \'%s\'\n", cliRecv->id, data, t->name);
         mes_send(cliRecv->connection, mes);
     }
 }
@@ -202,7 +201,7 @@ void appendNode(struct topic **head_ref, char *new_data, client *cli)
     client *newClients[MAX_SUBCRIBER_LEN] = {NULL};
 
     new_node->name = new_data;
-    new_node->clients[0] = cli; ////////// need consider
+    new_node->clients[0] = cli;
     new_node->next = NULL;
     if (*head_ref == NULL)
     {
@@ -247,16 +246,8 @@ void deleteNode(struct topic **head_ref, char *key)
     free(temp); // Free memory
 }
 
-//NOT use
-client *doBrokerFindSubcriber(broker *b, char *topic)
-{
-    // char* result = topic_tree_find_sub(b->topic_tree, topic);
-    client *result = NULL;
-    return result;
-}
-
 topic *doBrokerFindTopicNode(broker *b, char *topic_name)
 {
-    topic *result = topic_find_sub(b->topic_head, topic_name);
+    topic *result = topic_find_subcribers(b->topic_head, topic_name);
     return result;
 }

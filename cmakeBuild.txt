@@ -1,1 +1,5 @@
-cmake .. && cmake --build .
+#how to compiler project
+mkdir build
+cd build
+cmake ..
+cmake --build .

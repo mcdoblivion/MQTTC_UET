@@ -9,7 +9,6 @@
 #include "mynet.h"
 #include "message.h"
 
-
 message *mes_new()
 {
     message *new_message = (message *)malloc(sizeof(struct message));

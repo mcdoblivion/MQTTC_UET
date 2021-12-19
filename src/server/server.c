@@ -22,7 +22,7 @@
 #include "message.h"
 #include "mynet.h"
 
-#define DEFAULT_PORT 4449
+#define DEFAULT_PORT 4448
 #define DEFAULT_ADDR "127.0.0.1"
 
 broker *my_broker = NULL;
@@ -42,14 +42,14 @@ void serverHandleConnection(client *cli)
 
 void serverHandlePublisher(client *cli)
 {
-    printf("+status: handling publisher...\n");
+    // printf("+status: handling publisher...\n");
     message *client_PUB_message = cli->income;
 
     //find topic from mes income
     char *topic_name = client_PUB_message->variable_header;
     char *data = client_PUB_message->payload;
-    printf("ClientID \'%s\'->topic: %s\n", cli->id, topic_name);
-    printf("ClientID \'%s\'->message: %s\n", cli->id, data);
+    printf(">>New message received: \'%s\', topic: \'%s\', from client: \'%s\'.\n", data, topic_name, cli->id);
+
     if (topic_name && data)
     {
         char *msg = "PUBLISH OK";
@@ -77,7 +77,6 @@ void serverHandlePublisher(client *cli)
 
 void serverHandleSubscriber(client *cli)
 {
-    printf("+status: handling subciber...\n");
     message *client_SUB_message = cli->income;
 
     //find topic from mes income
@@ -100,7 +99,7 @@ void serverHandleSubscriber(client *cli)
 
 void handleUnsubscribe(client *cli)
 {
-    printf("+status: handling unsubcribe...\n");
+    // printf("+status: handling unsubcribe...\n");
     message *client_SUB_message = cli->income;
 
     //find topic from mes income
@@ -123,7 +122,6 @@ void handleUnsubscribe(client *cli)
 
 void serverHandleDISCON(client *cli)
 {
-    printf("+status: handling disconnect client...\n");
     mynet_close(cli->connection);
 }
 

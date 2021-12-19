@@ -7,7 +7,6 @@
 #include "mynet.h"
 #include "pthread.h"
 #include <stdbool.h>
-#include "subcriber.h"
 
 #define MAX_TOPIC_LIST_LENGTH 100
 // model
@@ -28,7 +27,6 @@ client *doBrokerAccept(broker *b);
 void doBrokerPulishMessage(client *cliSrc, topic* t, char* data);
 void doBrokerAddSubcriber(broker* b, char* topic_name, client* client);
 void doBrokerRmvSubcriber(broker *b, char *topic_name, client *cli);
-client *doBrokerFindSubcriber(broker *b, char *topic);
 topic *doBrokerFindTopicNode(broker *b, char *topic);
 
 #endif // _BROKER_H_

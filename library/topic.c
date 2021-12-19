@@ -1,7 +1,6 @@
 #include "mqtt.h"
 #include "topic.h"
 #include "string.h"
-#include "subcriber.h"
 
 void array_extract_token(char *topic, char **first, int *len)
 {
@@ -16,11 +15,10 @@ void array_extract_token(char *topic, char **first, int *len)
     }
 }
 
-topic* topic_find_sub(topic *head, char *topic_name)
+topic* topic_find_subcribers(topic *head, char *topic_name)
 {
     if (head == NULL)
     {
-        printf("+info: List topic is null\n");
         return NULL;
     }
     else
@@ -30,7 +28,7 @@ topic* topic_find_sub(topic *head, char *topic_name)
         {
             if (strcmp(current->name, topic_name) == 0)
             {
-                printf("+info: had found client_list\n");
+                printf("+info: had found client_list for topic \'%s\'\n", topic_name);
                 return current;
             }
             current = current->next;

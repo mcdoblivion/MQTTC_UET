@@ -11,7 +11,7 @@
 #include <arpa/inet.h>
 #include "mynet.h"
 
-#define FIXED_HEADER_SIZE 4 // bytes
+#define FIXED_HEADER_SIZE 4
 #define OFFSET_MESSAGE_TYPE 0
 #define OFFSET_FLAG 1
 #define OFFSET_REMAIN_VAR_SIZE 2
@@ -39,12 +39,6 @@ typedef enum
     FLAG_UN_SUB_ACK,
     FLAG_ACK,
 } MQTT_FLAG;
-
-struct variable_header
-{
-    char *key;
-    uint8_t *data;
-};
 
 struct message
 {
