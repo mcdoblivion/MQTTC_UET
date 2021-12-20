@@ -23,7 +23,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#define DEFAULT_PORT 4448
+#define DEFAULT_PORT 4447
 #define DEFAULT_ADDR "127.0.0.1"
 #define LENGTH 2048
 volatile sig_atomic_t flag = 0;
@@ -131,7 +131,7 @@ void clientDoSubscribe(mqtt_connection *con)
     printf("Enter topic: ");
     scanf("%s", topic);
     getchar();
-    // char *payload = "home/light";
+    // char *topic = "home/#";
     mes_SUB(outMes, flag_UN_SUB, (uint8_t *)topic, strlen(topic));
 
     //send SUB
@@ -252,7 +252,7 @@ int main(int argc, char *argv[])
     {
         printf("Client> ");
         gets(cmd);
-        if (strcmp(cmd, "connect") == 0)
+        if (strcmp(cmd, "connnect") == 0)
         {
             myConnection = clientDoConnect();
             if (myConnection->status != CONNECTED)
