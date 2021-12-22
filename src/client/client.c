@@ -125,7 +125,7 @@ void clientDoSubscribe(mqtt_connection *con)
     message *inMes = mes_new();
     message *outMes = mes_new();
 
-     // handle input topic for keyboard
+    // handle input topic for keyboard
     printf("Switch mode to subcriber, pls enter your topic need to subcribe!\n");
     char topic[30];
     printf("Enter topic: ");
@@ -201,6 +201,8 @@ void send_msg_handler(void *arg)
             todo = 3;
         else if (strcmp(cmd, "disconnect") == 0)
             todo = 4;
+        else if (strcmp(cmd, "") == 0)
+            continue;
 
         switch (todo)
         {
@@ -252,7 +254,7 @@ int main(int argc, char *argv[])
     {
         printf("Client> ");
         gets(cmd);
-        if (strcmp(cmd, "connnect") == 0)
+        if (strcmp(cmd, "connect") == 0)
         {
             myConnection = clientDoConnect();
             if (myConnection->status != CONNECTED)
@@ -263,6 +265,10 @@ int main(int argc, char *argv[])
             {
                 break;
             }
+        }
+        else if(strcmp(cmd, "") == 0)
+        {
+            continue;
         }
         else
         {
