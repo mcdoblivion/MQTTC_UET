@@ -23,7 +23,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#define DEFAULT_PORT 4447
+#define DEFAULT_PORT 4444
 #define DEFAULT_ADDR "127.0.0.1"
 #define LENGTH 2048
 volatile sig_atomic_t flag = 0;
@@ -237,7 +237,7 @@ void recv_msg_handler(void *arg)
         if (con->status == DISCONNECTED)
             break;
 
-        printf("\n=>>New message received: \'%s\', from topic: \'%s\'\nClient# ", listenMes->payload, listenMes->variable_header);
+        printf("\n=>>New message received: \'%s\', from topic: \'%s\'\n", listenMes->payload, listenMes->variable_header);
         // getchar();
         mes_free(listenMes);
     }
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
     {
         printf("Client> ");
         gets(cmd);
-        if (strcmp(cmd, "connect") == 0)
+        if (strcmp(cmd, "connnect") == 0)
         {
             myConnection = clientDoConnect();
             if (myConnection->status != CONNECTED)

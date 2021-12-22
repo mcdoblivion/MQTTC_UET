@@ -109,6 +109,7 @@ void doAddSubcriberToMultiTopic(broker *b, char *topic_name, client *cli)
     if (curNode == NULL)
     {
         appendNode(b, topic_name, cli);
+        printf("+info: Added new client with ID \'%s\' to topic \"%s\"\n", cli->id, topic_name);
         return;
     }
     else
@@ -156,6 +157,7 @@ void add_client_to_topic_node(topic *curNode, client *cli)
         return;
     }
 }
+
 void doBrokerAddSubcriber(broker *b, char *topic_name, client *cli)
 {
     // preprocessing topic string
@@ -172,6 +174,7 @@ void doBrokerAddSubcriber(broker *b, char *topic_name, client *cli)
         if (curNode == NULL)
         {
             appendNode(&(b->topic_head), topic_name, cli);
+            printf("+info: Added new client with ID \'%s\' to topic \"%s\"\n", cli->id, topic_name);
             return;
         }
         else
@@ -182,6 +185,7 @@ void doBrokerAddSubcriber(broker *b, char *topic_name, client *cli)
                 {
                     // add new node if no node contain this topic
                     appendNode(&(b->topic_head), topic_name, cli);
+                    printf("+info: Added new client with ID \'%s\' to topic \"%s\"\n", cli->id, topic_name);
                     return;
                 }
                 else
@@ -193,49 +197,112 @@ void doBrokerAddSubcriber(broker *b, char *topic_name, client *cli)
     }
 }
 
-void doBrokerRmvSubcriber(broker *b, char *topic_name, client *cli)
+void rmv_client_from_topic_node(topic *curNode, client *cli)
 {
-    topic *curNode = b->topic_head;
-    //head node is null?
-    if (curNode == NULL)
+    int isRmvSuccess = 0;
+    int cli_list_len = topic_get_clients_length(curNode);
+    if (cli_list_len == 0)
     {
-        printf("+error: there are no topic is \'%s\', cannot handle UNSubcribe\n", topic_name);
-        return;
+        printf("+error: there are no have client_id \'%s\' in topic \'%s\'\n", cli->id, curNode->name);
+        isRmvSuccess = 0;
     }
     else
-    { //head node contain topic which client subcribe to
-        if (strcmp(curNode->name, topic_name) == 0)
+    {
+        for (int i = 0; i < cli_list_len; i++)
         {
-            //do add client to topic node
-            int cli_list_len = topic_get_clients_length(curNode);
-            if (cli_list_len == 0)
+            //found out client and remove it
+            if (strcmp(curNode->clients[i]->id, cli->id) == 0)
             {
-                printf("+error: there are no have client_id \'%s\' in topic \'%s\'\n", cli->id, topic_name);
-            }
-            else
-            {
-                for (int i = 0; i < cli_list_len; i++)
-                {
-                    //found out client and remove it
-                    if (strcmp(curNode->clients[i]->id, cli->id) == 0)
-                    {
-                        curNode->clients[i] = curNode->clients[cli_list_len - 1];
-                        curNode->clients[cli_list_len - 1] = NULL;
-                        break;
-                    }
-                }
-
-                int new_cli_list_len = topic_get_clients_length(curNode);
-                printf(">>sum of subcriber remaining on topic \'%s\'= %d\n", topic_name, new_cli_list_len);
-                if (new_cli_list_len == 0)
-                {
-                    deleteNode(&(b->topic_head), topic_name);
-                    printf("+info: topic %s has been deleted(have no subcriber)\n", topic_name);
-                }
+                curNode->clients[i] = curNode->clients[cli_list_len - 1];
+                curNode->clients[cli_list_len - 1] = NULL;
+                isRmvSuccess = 1;
+                break;
             }
         }
     }
+
+    if (isRmvSuccess)
+        printf("+info: success unsubcribe topic \"%s\" for client_id \'%s\'\n", curNode->name, cli->id);
+    else
+        printf("+error: cannot unsubcribe topic \"%s\" for client_id \'%s\'\n", curNode->name, cli->id);
 }
+
+void doRmvSubcriberFromMultiTopic(broker *b, char *topic_name, client *cli)
+{
+    topic *curNode = b->topic_head;
+    if (curNode == NULL)
+    {
+        return;
+    }
+    else
+    {
+        do
+        {
+            if (strstr(curNode->name, topic_name))
+            {
+                rmv_client_from_topic_node(curNode, cli);
+
+                //check if curnode does not have any client
+                int new_cli_list_len = topic_get_clients_length(curNode);
+                printf(">>sum of subcriber remaining on topic \'%s\'= %d\n", curNode->name, new_cli_list_len);
+                if (new_cli_list_len == 0)
+                {
+                    printf("+info: deleted topic %s on broker\n", curNode->name);
+                    deleteNode(&(b->topic_head), curNode->name);
+                }
+            }
+            curNode = curNode->next;
+
+        } while (curNode != NULL);
+    }
+}
+
+void doBrokerRmvSubcriber(broker *b, char *topic_name, client *cli)
+{
+    // preprocessing topic string
+    int isContainWildcast = 0;
+    char *new_topic_name = hanldeTopicName(topic_name, &isContainWildcast);
+    if (isContainWildcast == 1 && new_topic_name != NULL) // add 1 client to mutli topic child of topic_name
+    {
+        doRmvSubcriberFromMultiTopic(b, new_topic_name, cli);
+    }
+    else
+    {
+        topic *curNode = b->topic_head;
+        //head node is null?
+        if (curNode == NULL)
+        {
+            printf("+error: there are no topic is \'%s\', cannot handle Unsubcribe\n", topic_name);
+            return;
+        }
+        else
+        {
+            do
+            {
+                if (strcmp(curNode->name, topic_name) == 0)
+                {
+                    rmv_client_from_topic_node(curNode, cli);
+
+                    //check if curnode does not have any client
+                    int new_cli_list_len = topic_get_clients_length(curNode);
+                    printf(">>sum of subcriber remaining on topic \'%s\'= %d\n", topic_name, new_cli_list_len);
+                    if (new_cli_list_len == 0)
+                    {
+                        printf("+info: deleted topic %s on broker\n", curNode->name);
+                        deleteNode(&(b->topic_head), topic_name);
+                    }
+
+                    break;
+                }
+                curNode = curNode->next;
+            } while (curNode != NULL);
+
+            //return something
+            return;
+        }
+    }
+}
+
 void appendNode(struct topic **head_ref, char *new_data, client *cli)
 {
     struct topic *new_node = (struct topic *)malloc(sizeof(struct topic));
