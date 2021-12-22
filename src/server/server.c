@@ -22,7 +22,7 @@
 #include "message.h"
 #include "mynet.h"
 
-#define DEFAULT_PORT 4447
+#define DEFAULT_PORT 4444
 #define DEFAULT_ADDR "127.0.0.1"
 
 broker *my_broker = NULL;
@@ -84,13 +84,12 @@ void serverHandleSubscriber(client *cli)
     char *msg;
     if (topic != NULL)
     {
-        printf("+info: subcribing to \"%s\" for client_id %s\n", topic, cli->id);
         doBrokerAddSubcriber(cli->broker, topic, cli);
         msg = "SUBCRIBER OK";
     }
     else
     {
-        printf("invalid topic, cannot handle Subcribe\n");
+        printf("invalid topic, cannot handle subcribe\n");
         msg = "SUBCRIBER FAIL";
     }
 
@@ -107,13 +106,12 @@ void handleUnsubscribe(client *cli)
     char *msg;
     if (topic != NULL)
     {
-        printf("+info: UnSubcribing topic \"%s\" for client_id \'%s\'\n", topic, cli->id);
         doBrokerRmvSubcriber(cli->broker, topic, cli);
         msg = "UNSUBCRIBER OK";
     }
     else
     {
-        printf("invalid topic, cannot handle UNSubcribe\n");
+        printf("Invalid topic, cannot handle Unsubcribe\n");
         msg = "UNSUBCRIBER FAIL";
     }
 
