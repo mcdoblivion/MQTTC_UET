@@ -164,7 +164,7 @@ void clientDoUnsubcribe(mqtt_connection *con)
     scanf("%s", topic);
     getchar();
     // char *payload = "home/light";
-    mes_UNSUB(outMes, FLAG_SUB, (uint8_t *)topic, strlen(topic));
+    mes_UNSUB(outMes, FLAG_UN_SUB_ACK, (uint8_t *)topic, strlen(topic));
 
     //SEND
     mes_send(con, outMes);
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
     {
         printf("Client> ");
         gets(cmd);
-        if (strcmp(cmd, "connnect") == 0)
+        if (strcmp(cmd, "connect") == 0)
         {
             myConnection = clientDoConnect();
             if (myConnection->status != CONNECTED)
@@ -276,7 +276,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    // thread for send message from broker
+    // thread for send message to broker
     pthread_t send_msg_thread;
     if (pthread_create(&send_msg_thread, NULL, (void *)send_msg_handler, myConnection) != 0)
     {
