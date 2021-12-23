@@ -1,5 +1,5 @@
 /**
- * @file client.c
+ * @file auto publish message
  * 
  * Client program
  * Nguyen Minh Thang
@@ -27,6 +27,22 @@
 #define DEFAULT_ADDR "127.0.0.1"
 #define LENGTH 2048
 volatile sig_atomic_t flag = 0;
+
+static const char const *demoData[] = {
+    "It\'s forecast to rain",
+    "The sky\'s overcast",
+    "It looks like rain",
+    "It\'s raining cats and dogs",
+    "It\'s clearing up",
+    "That sounds like thunder",
+    "That\'s lightning",
+    "It\'s not a very nice day",
+    "What miserable weather",
+    "It\'s supposed to clear up later",
+    "It\'s pouring with rain ",
+    "The weather\'s fine",
+    "It\'s going to freeze tonight",
+};
 
 int pexit(const char *str)
 {
@@ -87,19 +103,19 @@ void clientDoPublish(mqtt_connection *con)
     message *outMes = mes_new();
 
     // handle input topic for keyboard
-    printf("Switch mode to publisher, pls enter your topic and data!\n");
-    char topic[30];
 
-    char data[30];
-    printf("Enter topic: ");
-    scanf("%s", topic);
-    getchar();
-    printf("Enter data: ");
-    fflush(stdin);
-    // fgets(data, sizeof(data), stdin);
-    gets(data);
-    // char *topic = "home/light";
-    // char *data = "it is lower energy";
+    // char topic[30];
+    // char data[30];
+    // printf("Enter topic: ");
+    // scanf("%s", topic);
+    // getchar();
+    // printf("Enter data: ");
+    // fflush(stdin);
+    // gets(data);
+
+    char *topic = "home/livingroom";
+    static const int demoDataLength = sizeof(demoData) / sizeof(*demoData);
+    char *data = demoData[rand() % demoDataLength];
 
     //create message PUB
     mes_PUB(outMes, topic, FLAG_PUB, data, strlen(data));
@@ -190,19 +206,7 @@ void send_msg_handler(void *arg)
     int todo = 0;
     while (1)
     {
-        printf("Client# ");
-        gets(cmd);
-        if (strcmp(cmd, "publish") == 0)
-            todo = 1; // Publisher
-        else if (strcmp(cmd, "subcribe") == 0)
-            todo = 2; // Subscriber
-        else if (strcmp(cmd, "unsubcribe") == 0)
-            todo = 3;
-        else if (strcmp(cmd, "disconnect") == 0)
-            todo = 4;
-        else if (strcmp(cmd, "") == 0)
-            continue;
-
+        int todo = 1;
         switch (todo)
         {
         case 1:
@@ -222,6 +226,7 @@ void send_msg_handler(void *arg)
             break;
         }
         todo = 0;
+        sleep(2);
     }
     catch_ctrl_c_and_exit(2);
 }
@@ -265,7 +270,7 @@ int main(int argc, char *argv[])
                 break;
             }
         }
-        else if(strcmp(cmd, "") == 0)
+        else if (strcmp(cmd, "") == 0)
         {
             continue;
         }
