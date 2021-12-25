@@ -66,7 +66,7 @@ void serverHandlePublisher(client *cli)
 
     if (cliSubLen > 0)
     {
-        printf("+info: publishing to each client in list\n");
+        // printf("+info: publishing to each client in list\n");
         doBrokerPulishMessage(cli, t, data);
     }
     else
