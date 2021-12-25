@@ -22,7 +22,7 @@
 #include "message.h"
 #include "mynet.h"
 
-#define DEFAULT_PORT 4447
+#define DEFAULT_PORT 4444
 #define DEFAULT_ADDR "127.0.0.1"
 
 broker *my_broker = NULL;

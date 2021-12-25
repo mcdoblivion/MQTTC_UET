@@ -23,7 +23,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#define DEFAULT_PORT 4447
+#define DEFAULT_PORT 4444
 #define DEFAULT_ADDR "127.0.0.1"
 #define LENGTH 2048
 volatile sig_atomic_t flag = 0;
@@ -194,9 +194,9 @@ void send_msg_handler(void *arg)
         gets(cmd);
         if (strcmp(cmd, "publish") == 0)
             todo = 1; // Publisher
-        else if (strcmp(cmd, "subcribe") == 0)
+        else if (strcmp(cmd, "subscribe") == 0)
             todo = 2; // Subscriber
-        else if (strcmp(cmd, "unsubcribe") == 0)
+        else if (strcmp(cmd, "unsubscribe") == 0)
             todo = 3;
         else if (strcmp(cmd, "disconnect") == 0)
             todo = 4;

@@ -33,7 +33,8 @@ topic* topic_find_subcribers(topic *head, char *topic_name)
             }
             current = current->next;
         }
-        //if had not found any client for this topic_name, create new topic with list of subcriber is null
+
+        //return null if not having any client subscribe
         return NULL;
     }
 }

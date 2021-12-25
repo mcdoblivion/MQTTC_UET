@@ -23,7 +23,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#define DEFAULT_PORT 4447
+#define DEFAULT_PORT 4444
 #define DEFAULT_ADDR "127.0.0.1"
 #define LENGTH 2048
 volatile sig_atomic_t flag = 0;
@@ -226,7 +226,7 @@ void send_msg_handler(void *arg)
             break;
         }
         todo = 0;
-        sleep(2);
+        sleep(10);
     }
     catch_ctrl_c_and_exit(2);
 }
